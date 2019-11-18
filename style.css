@@ -1,0 +1,97 @@
+div {
+	text-align: center;
+}
+
+.row {
+	margin: 1em;
+}
+
+.container.file-upload {
+	max-width: 400px;
+	display: block;
+}
+
+.container.browser {
+	display: block;
+}
+
+.cont-exercises {
+	display: flex;
+	height: 5rem;
+	overflow: hidden;
+	font-size: .8rem;
+	color: white;
+	background-color: #cfdfef;
+	border-radius: 0;
+	margin-top: 2px;
+}
+
+.exercise {
+	margin: 1px;
+	background-color: #2196f3;
+	/* 166 213 250 */
+}
+
+.intro {
+	background-color: #424242;
+}
+
+.outro {
+	background-color: #424242;
+}
+
+.rest {
+	background-color: #673ab7;
+}
+
+.exer-icon {
+	display: block;
+	text-align: right;
+}
+
+.exer-name {
+	display: block;
+	margin-top: 1rem;
+}
+
+.card {
+	margin-left: 15px;
+	margin-right: 15px;
+	width: 100%;
+}
+
+.card-footer {
+	text-align: right;
+}
+
+#btn-save-all {
+	width: 40%;
+	max-width: 300px;
+	min-width: 100px;
+}
+
+.vertical-line {
+	border-left: 1px solid black;
+	width: 1px;
+}
+
+.horizontal-line {
+	border-top: 1px solid black;
+	height: 1px;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+.progress{
+	text-align: right;
+}
+
+#audio-duration {
+	font-size: .75rem;
+	margin: 0;
+	padding: 0;
+}
+
+p {
+	margin: auto;
+}
