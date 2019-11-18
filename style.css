@@ -27,8 +27,8 @@ div {
 }
 
 .exercise {
-	margin-right: 1px;
 	background-color: #2196f3;
+	border-right: 1px solid #cfdfef;
 	/* 166 213 250 */
 }
 
@@ -84,6 +84,10 @@ div {
 
 .progress{
 	text-align: right;
+}
+
+.progress-bar {
+	transition: width .2s;
 }
 
 #audio-duration {
