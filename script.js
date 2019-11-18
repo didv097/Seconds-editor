@@ -22,6 +22,7 @@ let btn_previous = document.getElementById("btn-previous");
 let btn_next = document.getElementById("btn-next");
 let btn_save = document.getElementById("btn-save");
 let btn_save_all = document.getElementById("btn-save-all");
+let btn_add_exercise = document.getElementById("btn-add-exercise");
 
 let audio;
 let workouts = []; // id, name, mp3, live_data
@@ -257,3 +258,37 @@ btn_save.addEventListener("click", () => {
 		intervals[cur_interval + 1].start_time = input_end_time.value;
 	}
 });
+btn_add_exercise.addEventListener("click", () => {
+  let new_idx = intervals.length;
+  let remaning_time = dur_audio - intervals[new_idx - 1].end_time;
+  if (remaning_time <= 0) {
+    return;
+  }
+  let new_interval = {
+    name: "Exercise",
+    start_time: intervals[new_idx - 1].end_time,
+    duration: Math.min(remaning_time, 10)
+  };
+  new_interval.end_time = new_interval.start_time + new_interval.duration;
+  intervals.push(new_interval);
+  let elem_interval = document.createElement("div");
+  elem_interval.classList = ["exercise"];
+  elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
+  let elem_icon = document.createElement("span");
+  elem_icon.className = "exer-icon";
+  elem_icon.innerHTML = "&#x1f5d1;";
+  elem_icon.addEventListener("click", () => {
+    /* remove interval */
+  })
+  let elem_name = document.createElement("span");
+  elem_name.className = "exer-name";
+  elem_name.innerHTML = new_interval.name;
+  elem_name.addEventListener("click", () => {
+    cur_interval = new_idx;
+    cur_time = intervals[cur_interval].start_time;
+    audio.currentTime = cur_time;
+  })
+  elem_interval.appendChild(elem_icon);
+  elem_interval.appendChild(elem_name);
+  cont_exercises.appendChild(elem_interval);
+})
