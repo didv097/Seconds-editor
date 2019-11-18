@@ -13,6 +13,7 @@ let btn_play = document.getElementById("btn-play");
 let btn_forward10 = document.getElementById("btn-forward10s");
 let btn_pause = document.getElementById("btn-pause");
 let opt_exercises = document.getElementById("opt-exercises");
+let btn_match = document.getElementById("btn-match");
 
 let audio;
 let workouts = []; // id, name, mp3, live_data
@@ -121,26 +122,29 @@ btn_process.onclick = event => {
 		})
 		xHttp.send(null);
 	});
-	audio.addEventListener("timeupdate", () => {
-		cur_time = audio.currentTime;
-		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
-			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
-		progressbar.style.width = (100 * cur_time / dur_audio) + "%";
-	});
-	btn_play.addEventListener("click", () => {
-		audio.play();
-	});
-	btn_pause.addEventListener("click", () => {
-		audio.pause();
-	});
-	btn_back10.addEventListener("click", () => {
-		cur_time -= 10;
-		cur_time = Math.max(cur_time, 0);
-		audio.currentTime = cur_time;
-	});
-	btn_forward10.addEventListener("click", () => {
-		cur_time += 10;
-		cur_time = Math.min(cur_time, dur_audio);
-		audio.currentTime = cur_time;
-	});
 }
+audio.addEventListener("timeupdate", () => {
+	cur_time = audio.currentTime;
+	elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
+		+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
+	progressbar.style.width = (100 * cur_time / dur_audio) + "%";
+});
+btn_play.addEventListener("click", () => {
+	audio.play();
+});
+btn_pause.addEventListener("click", () => {
+	audio.pause();
+});
+btn_back10.addEventListener("click", () => {
+	cur_time -= 10;
+	cur_time = Math.max(cur_time, 0);
+	audio.currentTime = cur_time;
+});
+btn_forward10.addEventListener("click", () => {
+	cur_time += 10;
+	cur_time = Math.min(cur_time, dur_audio);
+	audio.currentTime = cur_time;
+});
+btn_match.addEventListener("click", () => {
+	
+})

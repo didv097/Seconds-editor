@@ -19,7 +19,7 @@ div {
 	display: flex;
 	height: 5rem;
 	overflow: hidden;
-	font-size: .8rem;
+	font-size: .7rem;
 	color: white;
 	background-color: #cfdfef;
 	border-radius: 0;
@@ -94,4 +94,9 @@ div {
 
 p {
 	margin: auto;
+}
+
+#btn-match {
+	width: 100%;
+	margin-top: 1rem;
 }
