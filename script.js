@@ -75,6 +75,23 @@ xHttpCSV.addEventListener("load", () => {
 	}
 });
 xHttpCSV.send(null);
+function removeInterval(idx) {
+	if (idx < intervals.length - 1) {
+		for (let j = idx + 1; j < intervals.length; j ++) {
+			intervals[j].start_time -= intervals[idx].duration;
+			intervals[j].end_time -= intervals[idx].duration;
+			document.getElementById("exercise-" + j).id = "exercise-" + (j - 1);
+			console.log(j + " -> " + (j - 1))
+		}
+	}
+	intervals.splice(idx, 1);
+	cont_exercises.removeChild(document.getElementById("exercise-" + idx));
+}
+function gotoInterval(idx) {
+	cur_interval = idx;
+	cur_time = intervals[cur_interval].start_time;
+	audio.currentTime = cur_time;
+}
 function btnProcessClicked() {
 	selectedIndex = opt_workout.selectedIndex;
 	if (selectedIndex < 0) {
@@ -118,19 +135,20 @@ function btnProcessClicked() {
 					elem_interval.classList = ["exercise"];
 					// elem_interval.classList.add("intro");
 					elem_interval.style.width = (intervals[i].duration / dur_audio * 100) + "%";
+					elem_interval.id = "exercise-" + i;
 					let elem_icon = document.createElement("span");
 					elem_icon.className = "exer-icon";
 					elem_icon.innerHTML = "&#x1f5d1;";
-					elem_icon.addEventListener("click", () => {
-						/* remove interval */
+					elem_icon.addEventListener("click", (event) => {
+						let idx = Number(event.target.parentElement.id.slice(9));
+						removeInterval(idx);
 					})
 					let elem_name = document.createElement("span");
 					elem_name.className = "exer-name";
 					elem_name.innerHTML = intervals[i].name;
-					elem_name.addEventListener("click", () => {
-						cur_interval = i;
-						cur_time = intervals[cur_interval].start_time;
-						audio.currentTime = cur_time;
+					elem_name.addEventListener("click", (event) => {
+						let idx = Number(event.target.parentElement.id.slice(9));
+						gotoInterval(idx);
 					})
 					elem_interval.appendChild(elem_icon);
 					elem_interval.appendChild(elem_name);
@@ -145,19 +163,30 @@ function btnProcessClicked() {
 		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
 		progressbar.style.width = (100 * cur_time / dur_audio) + "%";
+		cur_interval = -1;
 		for (let i = 0; i < intervals.length; i ++) {
 			if (cur_time < intervals[i].end_time) {
 				cur_interval = i;
 				break;
 			}
 		}
-		cur_start_time = intervals[cur_interval].start_time;
-		cur_duration = intervals[cur_interval].duration;
-		cur_end_time = intervals[cur_interval].end_time;
-		input_start_time.value = cur_start_time;
-		input_duration.value = cur_duration;
-		input_end_time.value = cur_end_time;
-		text_exercise.innerText = intervals[cur_interval].name;
+		if (cur_interval < 0) {
+			cur_start_time = 0;
+			cur_duration = 0;
+			cur_end_time = 0;
+			input_start_time.value = 0;
+			input_duration.value = 0;
+			input_end_time.value = 0;
+			text_exercise.innerText = "";
+		} else {
+			cur_start_time = intervals[cur_interval].start_time;
+			cur_duration = intervals[cur_interval].duration;
+			cur_end_time = intervals[cur_interval].end_time;
+			input_start_time.value = cur_start_time;
+			input_duration.value = cur_duration;
+			input_end_time.value = cur_end_time;
+			text_exercise.innerText = intervals[cur_interval].name;
+		}
 	});
 }
 btn_process.addEventListener("click", () => btnProcessClicked());
@@ -273,20 +302,21 @@ btn_add_exercise.addEventListener("click", () => {
   intervals.push(new_interval);
   let elem_interval = document.createElement("div");
   elem_interval.classList = ["exercise"];
-  elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
+	elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
+	elem_interval.id = "exercise-" + new_idx;
   let elem_icon = document.createElement("span");
   elem_icon.className = "exer-icon";
   elem_icon.innerHTML = "&#x1f5d1;";
   elem_icon.addEventListener("click", () => {
-    /* remove interval */
+		let idx = Number(event.target.parentElement.id.slice(9));
+		removeInterval(idx);
   })
   let elem_name = document.createElement("span");
   elem_name.className = "exer-name";
   elem_name.innerHTML = new_interval.name;
   elem_name.addEventListener("click", () => {
-    cur_interval = new_idx;
-    cur_time = intervals[cur_interval].start_time;
-    audio.currentTime = cur_time;
+		let idx = Number(event.target.parentElement.id.slice(9));
+		gotoInterval(idx);
   })
   elem_interval.appendChild(elem_icon);
   elem_interval.appendChild(elem_name);
