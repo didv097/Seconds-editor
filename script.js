@@ -143,17 +143,17 @@ function btnProcessClicked() {
 					let elem_icon = document.createElement("span");
 					elem_icon.className = "exer-icon";
 					elem_icon.innerHTML = "&#x1f5d1;";
-					elem_icon.addEventListener("click", (event) => {
+					elem_icon.onclick = (event) => {
 						let idx = Number(event.target.parentElement.id.slice(9));
 						removeInterval(idx);
-					})
+					};
 					let elem_name = document.createElement("span");
 					elem_name.className = "exer-name";
 					elem_name.innerHTML = intervals[i].name;
-					elem_name.addEventListener("click", (event) => {
+					elem_name.onclick = (event) => {
 						let idx = Number(event.target.parentElement.id.slice(9));
 						gotoInterval(idx);
-					})
+					};
 					elem_interval.appendChild(elem_icon);
 					elem_interval.appendChild(elem_name);
 					cont_exercises.appendChild(elem_interval);
@@ -162,7 +162,7 @@ function btnProcessClicked() {
 		})
 		xHttp.send(null);
 	});
-	audio.addEventListener("timeupdate", () => {
+	audio.ontimeupdate = () => {
 		cur_time = audio.currentTime;
 		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
@@ -191,171 +191,171 @@ function btnProcessClicked() {
 			input_end_time.value = cur_end_time;
 			text_exercise.innerText = intervals[cur_interval].name;
 		}
-	});
+	};
+	btn_add_exercise.onclick = () => {
+		let new_idx = intervals.length;
+		let remaning_time, start_time;
+		if (new_idx == 0) {
+			remaning_time = dur_audio;
+			start_time = 0;
+		} else {
+			remaning_time = dur_audio - intervals[new_idx - 1].end_time;
+			start_time = intervals[new_idx - 1].end_time;
+		}
+		if (remaning_time <= 0) {
+			return;
+		}
+		let new_interval = {
+			name: "Exercise",
+			start_time: start_time,
+			duration: Math.min(remaning_time, 20)
+		};
+		new_interval.end_time = new_interval.start_time + new_interval.duration;
+		intervals.push(new_interval);
+		let elem_interval = document.createElement("div");
+		elem_interval.classList = ["exercise"];
+		elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
+		elem_interval.id = "exercise-" + new_idx;
+		let elem_icon = document.createElement("span");
+		elem_icon.className = "exer-icon";
+		elem_icon.innerHTML = "&#x1f5d1;";
+		elem_icon.onclick = () => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			removeInterval(idx);
+		};
+		let elem_name = document.createElement("span");
+		elem_name.className = "exer-name";
+		elem_name.innerHTML = new_interval.name;
+		elem_name.onclick = () => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			gotoInterval(idx);
+		};
+		elem_interval.appendChild(elem_icon);
+		elem_interval.appendChild(elem_name);
+		cont_exercises.appendChild(elem_interval);
+	};
+	btn_match.onclick = () => {
+		cur_exercise = -1;
+		for (let i = 0; i < exercises.length; i ++) {
+			if (exercises[i].name == intervals[cur_interval].name) {
+				cur_exercise = i;
+				break;
+			}
+		}
+		if (cur_exercise < 0) {
+			exercises.push({
+				name: intervals[cur_interval].name,
+				id: intervals[cur_interval].name
+			});
+			let opt = document.createElement("option");
+			opt.text = intervals[cur_interval].name;
+			opt_exercises.add(opt);
+			cur_exercise = exercises.length - 1;
+			opt_exercises.value = intervals[cur_interval].name;
+		} else {
+			opt_exercises.value = exercises[cur_exercise].name;
+		}
+	};
+	input_start_time.onchange = () => {
+		if (cur_interval <= 0) {
+			input_start_time.value = 0;
+			input_duration.value = cur_end_time;
+			return;
+		}
+		if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
+			input_start_time.value = cur_start_time;
+		}
+		cur_start_time = input_start_time.value;
+		cur_duration = cur_end_time - cur_start_time;
+		input_duration.value = cur_duration;
+	};
+	input_end_time.onchange = () => {
+		if (cur_interval >= intervals.length - 1) {
+			input_end_time.value = cur_end_time;
+			return;
+		}
+		if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
+			input_end_time.value = cur_end_time;
+		}
+		cur_end_time = input_end_time.value;
+		cur_duration = cur_end_time - cur_start_time;
+		input_duration.value = cur_duration;
+	};
+	btn_save.onclick = () => {
+		if (cur_interval > 0) {
+			intervals[cur_interval].start_time = cur_start_time;
+			intervals[cur_interval - 1].end_time = cur_start_time;
+			intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
+			document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
+		}
+		intervals[cur_interval].end_time = cur_end_time;
+		intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
+		document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
+		if (cur_interval < intervals.length - 1) {
+			intervals[cur_interval + 1].start_time = cur_end_time;
+			intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
+			document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
+		}
+	};
+	btn_save_all.onclick = () => {
+		let temp = {};
+		Object.assign(temp, csv_content);
+		for (it of temp.intervals) {
+			delete it.start_time;
+			delete it.end_time;
+		}
+		console.log(JSON.stringify(temp, null, "   "))
+		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
+		let blobUrl = (URL || webkitURL).createObjectURL(file);
+		window.location = blobUrl;
+	};
+	/* btnProcessClicked() */
 }
-btn_process.addEventListener("click", () => btnProcessClicked());
-btn_play.addEventListener("click", () => {
+btn_process.onclick = () => btnProcessClicked();
+btn_play.onclick = () => {
 	audio.play();
 	input_start_time.readOnly = true;
 	// input_duration.readOnly = true;
 	input_end_time.readOnly = true;
-});
-btn_pause.addEventListener("click", () => {
+};
+btn_pause.onclick = () => {
 	audio.pause();
 	input_start_time.readOnly = false;
 	// input_duration.readOnly = false;
 	input_end_time.readOnly = false;
-});
-btn_back10.addEventListener("click", () => {
+};
+btn_back10.onclick = () => {
 	cur_time -= 10;
 	cur_time = Math.max(cur_time, 0);
 	audio.currentTime = cur_time;
-});
-btn_forward10.addEventListener("click", () => {
+};
+btn_forward10.onclick = () => {
 	cur_time += 10;
 	cur_time = Math.min(cur_time, dur_audio);
 	audio.currentTime = cur_time;
-});
-btn_match.addEventListener("click", () => {
-	cur_exercise = -1;
-	for (let i = 0; i < exercises.length; i ++) {
-		if (exercises[i].name == intervals[cur_interval].name) {
-			cur_exercise = i;
-			break;
-		}
-	}
-	if (cur_exercise < 0) {
-		exercises.push({
-			name: intervals[cur_interval].name,
-			id: intervals[cur_interval].name
-		});
-		let opt = document.createElement("option");
-		opt.text = intervals[cur_interval].name;
-		opt_exercises.add(opt);
-		cur_exercise = exercises.length - 1;
-		opt_exercises.value = intervals[cur_interval].name;
-	} else {
-		opt_exercises.value = exercises[cur_exercise].name;
-	}
-});
-btn_previous.addEventListener("click", () => {
+};
+btn_previous.onclick = () => {
 	if (selectedIndex > 0) {
 		opt_workout.selectedIndex --;
 		btnProcessClicked();
 	}
-});
-btn_next.addEventListener("click", () => {
+};
+btn_next.onclick = () => {
 	if (selectedIndex < workouts.length - 1) {
 		opt_workout.selectedIndex ++;
 		btnProcessClicked();
 	}
-});
-input_start_time.addEventListener("input", () => {
+};
+input_start_time.oninput = () => {
 	input_duration.value = input_end_time.value - input_start_time.value;
-});
-input_end_time.addEventListener("input", () => {
+};
+input_end_time.oninput = () => {
 	input_duration.value = input_end_time.value - input_start_time.value;
-});
-input_start_time.addEventListener("change", () => {
-	if (cur_interval <= 0) {
-		input_start_time.value = 0;
-		input_duration.value = cur_end_time;
-		return;
-	}
-	if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
-		input_start_time.value = cur_start_time;
-	}
-	cur_start_time = input_start_time.value;
-	cur_duration = cur_end_time - cur_start_time;
-	input_duration.value = cur_duration;
-});
-input_end_time.addEventListener("change", () => {
-	if (cur_interval >= intervals.length - 1) {
-		input_end_time.value = cur_end_time;
-		return;
-	}
-	if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
-		input_end_time.value = cur_end_time;
-	}
-	cur_end_time = input_end_time.value;
-	cur_duration = cur_end_time - cur_start_time;
-	input_duration.value = cur_duration;
-});
-btn_add_exercise.addEventListener("click", () => {
-	let new_idx = intervals.length;
-	let remaning_time, start_time;
-	if (new_idx == 0) {
-		remaning_time = dur_audio;
-		start_time = 0;
-	} else {
-		remaning_time = dur_audio - intervals[new_idx - 1].end_time;
-		start_time = intervals[new_idx - 1].end_time;
-	}
-  if (remaning_time <= 0) {
-    return;
-  }
-  let new_interval = {
-    name: "Exercise",
-    start_time: start_time,
-    duration: Math.min(remaning_time, 20)
-  };
-  new_interval.end_time = new_interval.start_time + new_interval.duration;
-  intervals.push(new_interval);
-  let elem_interval = document.createElement("div");
-  elem_interval.classList = ["exercise"];
-	elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
-	elem_interval.id = "exercise-" + new_idx;
-  let elem_icon = document.createElement("span");
-  elem_icon.className = "exer-icon";
-  elem_icon.innerHTML = "&#x1f5d1;";
-  elem_icon.addEventListener("click", () => {
-		let idx = Number(event.target.parentElement.id.slice(9));
-		removeInterval(idx);
-  })
-  let elem_name = document.createElement("span");
-  elem_name.className = "exer-name";
-  elem_name.innerHTML = new_interval.name;
-  elem_name.addEventListener("click", () => {
-		let idx = Number(event.target.parentElement.id.slice(9));
-		gotoInterval(idx);
-  })
-  elem_interval.appendChild(elem_icon);
-  elem_interval.appendChild(elem_name);
-  cont_exercises.appendChild(elem_interval);
-});
-btn_save.addEventListener("click", () => {
-	if (cur_interval > 0) {
-		intervals[cur_interval].start_time = cur_start_time;
-		intervals[cur_interval - 1].end_time = cur_start_time;
-		intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
-		document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
-	}
-	intervals[cur_interval].end_time = cur_end_time;
-	intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
-	document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
-	if (cur_interval < intervals.length - 1) {
-		intervals[cur_interval + 1].start_time = cur_end_time;
-		intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
-		document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
-	}
-});
-btn_save_all.addEventListener("click", () => {
-	let temp = {};
-	Object.assign(temp, csv_content);
-	for (it of temp.intervals) {
-		delete it.start_time;
-		delete it.end_time;
-	}
-	console.log(JSON.stringify(temp, null, "   "))
-	let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
-	let blobUrl = (URL || webkitURL).createObjectURL(file);
-	window.location = blobUrl;
-});
+};
 
 /* --------------------------- builder ------------------------------ */
 
 btn_builder.addEventListener("click", () => {
-	return;
 	cont_file_upload.style.display = "none";
 	cont_browser.style.display = "block";
 	document.getElementById("btn-previous").parentElement.parentElement.style.display = "none";
@@ -364,4 +364,7 @@ btn_builder.addEventListener("click", () => {
 	document.getElementsByClassName("progress")[0].style.display = "none";
 	intervals = [];
 	cont_exercises.innerHTML = "";
+
+	btn_add_exercise.onclick = () => {
+	}
 })
