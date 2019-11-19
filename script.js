@@ -278,15 +278,22 @@ input_end_time.addEventListener("change", () => {
 	input_duration.value = cur_duration;
 });
 btn_add_exercise.addEventListener("click", () => {
-  let new_idx = intervals.length;
-  let remaning_time = dur_audio - intervals[new_idx - 1].end_time;
+	let new_idx = intervals.length;
+	let remaning_time, start_time;
+	if (new_idx == 0) {
+		remaning_time = dur_audio;
+		start_time = 0;
+	} else {
+		remaning_time = dur_audio - intervals[new_idx - 1].end_time;
+		start_time = intervals[new_idx - 1].end_time;
+	}
   if (remaning_time <= 0) {
     return;
   }
   let new_interval = {
     name: "Exercise",
-    start_time: intervals[new_idx - 1].end_time,
-    duration: Math.min(remaning_time, 10)
+    start_time: start_time,
+    duration: Math.min(remaning_time, 20)
   };
   new_interval.end_time = new_interval.start_time + new_interval.duration;
   intervals.push(new_interval);
