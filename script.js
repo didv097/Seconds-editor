@@ -351,3 +351,17 @@ btn_save_all.addEventListener("click", () => {
 	let blobUrl = (URL || webkitURL).createObjectURL(file);
 	window.location = blobUrl;
 });
+
+/* --------------------------- builder ------------------------------ */
+
+btn_builder.addEventListener("click", () => {
+	return;
+	cont_file_upload.style.display = "none";
+	cont_browser.style.display = "block";
+	document.getElementById("btn-previous").parentElement.parentElement.style.display = "none";
+	document.getElementById("btn-back10s").parentElement.style.display = "none";
+	document.getElementById("cur-playback").style.display = "none";
+	document.getElementsByClassName("progress")[0].style.display = "none";
+	intervals = [];
+	cont_exercises.innerHTML = "";
+})
