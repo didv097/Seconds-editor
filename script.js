@@ -87,7 +87,6 @@ function removeInterval(idx) {
 			intervals[j].start_time -= intervals[idx].duration;
 			intervals[j].end_time -= intervals[idx].duration;
 			document.getElementById("exercise-" + j).id = "exercise-" + (j - 1);
-			console.log(j + " -> " + (j - 1))
 		}
 	}
 	intervals.splice(idx, 1);
@@ -127,7 +126,6 @@ function btnProcessClicked() {
 			if (xHttp.readyState == 4 && xHttp.status == 200) {
 				csv_content = JSON.parse(xHttp.responseText);
 				intervals = csv_content.intervals;
-				console.log(intervals)
 				cont_exercises.innerHTML = "";
 				let temp = 0;
 				for (let i = 0; i < intervals.length; i ++) {
@@ -342,7 +340,6 @@ function btnProcessClicked() {
 			delete it.start_time;
 			delete it.end_time;
 		}
-		console.log(JSON.stringify(temp, null, "   "))
 		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
 		let blobUrl = (URL || webkitURL).createObjectURL(file);
 		window.location = blobUrl;
