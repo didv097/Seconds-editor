@@ -199,13 +199,23 @@ function btnProcessClicked() {
 		}
 		btn_match.className = "btn btn-danger";
 		btn_match.innerText = "Not match";
-		for (ex in exercises) {
-			if (intervals[cur_interval].name == ex.name) {
+		opt_exercises.value = "";
+		for (ex of exercises) {
+			if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
 				btn_match.className = "btn btn-success";
 				btn_match.innerText = "Match";
+				opt_exercises.value = ex.name;
+				break;
 			}
 		}
 	};
+	opt_exercises.onchange = () => {
+		if (opt_exercises == "") {
+			return;
+		}
+		intervals[cur_interval].name = opt_exercises.value;
+		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+	}
 	function addExercise(type) {
 		let new_idx = intervals.length;
 		let remaning_time, start_time;
@@ -263,32 +273,6 @@ function btnProcessClicked() {
 	};
 	btn_add_outro.onclick = () => {
 		addExercise("Outro");
-	};
-	btn_match.onclick = () => {
-		// intervals[cur_interval].name = opt_exercises.value;
-		// intervals[cur_interval].id = exercises[opt_exercises.selectedIndex].id;
-		// document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
-/*		cur_exercise = -1;
-		for (let i = 0; i < exercises.length; i ++) {
-			if (exercises[i].name == intervals[cur_interval].name) {
-				cur_exercise = i;
-				break;
-			}
-		}
-		if (cur_exercise < 0) {
-			exercises.push({
-				name: intervals[cur_interval].name,
-				id: intervals[cur_interval].name
-			});
-			let opt = document.createElement("option");
-			opt.text = intervals[cur_interval].name;
-			opt_exercises.add(opt);
-			cur_exercise = exercises.length - 1;
-			opt_exercises.value = intervals[cur_interval].name;
-		} else {
-			opt_exercises.value = exercises[cur_exercise].name;
-		}
-*/
 	};
 	let updateIntervals = () => {
 		if (cur_interval > 0) {
