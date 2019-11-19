@@ -356,6 +356,7 @@ input_end_time.oninput = () => {
 /* --------------------------- builder ------------------------------ */
 
 btn_builder.addEventListener("click", () => {
+	return;
 	cont_file_upload.style.display = "none";
 	cont_browser.style.display = "block";
 	document.getElementById("btn-previous").parentElement.parentElement.style.display = "none";
