@@ -34,7 +34,7 @@ let intervals = [];	// type, name, duration, start, end
 let exercises = []; // name, id
 let selectedWorkout = -1;
 let dur_audio = 0, cur_time = 0;
-let cur_interval = 0, cur_exercise = 0;
+let cur_interval = -1, cur_exercise = -1;
 let cur_start_time = 0, cur_duration = 0, cur_end_time = 0;
 let csv_content = {};
 
@@ -173,14 +173,17 @@ function btnProcessClicked() {
 		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
 		progressbar.style.width = (100 * cur_time / dur_audio) + "%";
-		cur_interval = -1;
-		for (let i = 0; i < intervals.length; i ++) {
+		let i;
+		for (i = 0; i < intervals.length; i ++) {
 			if (cur_time < intervals[i].end_time) {
+				if (cur_interval == i) {
+					return;
+				}
 				cur_interval = i;
 				break;
 			}
 		}
-		if (cur_interval < 0) {
+		if (i >= intervals.length) {
 			cur_start_time = 0;
 			cur_duration = 0;
 			cur_end_time = 0;
@@ -323,15 +326,48 @@ function btnProcessClicked() {
 		input_duration.value = cur_duration;
 		updateIntervals();
 	};
-	btn_save.onclick = () => {
-		updateIntervals();
-	};
-	btn_save_all.onclick = () => {
-		let temp = {};
-		Object.assign(temp, csv_content);
-		for (it of temp.intervals) {
-			delete it.start_time;
-			delete it.end_time;
+	btn_save.onclick = btn_save_all.onclick = () => {
+		let temp = {
+			"overrun": csv_content.overrun,
+			"lastPerformedTimeInterval": csv_content.lastPerformedTimeInterval,
+			"intervals": [],
+			"numberOfSets": csv_content.numberOfSets,
+			"_type": csv_content._type,
+			"soundScheme": csv_content.soundScheme,
+			"music":{
+					"_type": csv_content.music._type,
+					"shuffle": csv_content.music.shuffle,
+					"volume": csv_content.music.volume,
+					"resume": csv_content.music.resume,
+					"persist": csv_content.music.persist
+			},
+			"type": csv_content.type,
+			"identifier": csv_content.identifier,
+			"name": csv_content.name,
+			"activity": csv_content.activity
+		}
+		for (let it of intervals) {
+			let temp1 = {
+				"splitRest": 0,
+				"ducked": false,
+				"rest": false,
+				"music":{ 
+					"_type":"music",
+					"shuffle":false,
+					"volume":1,
+					"resume":false,
+					"persist":false
+				},
+				"color":0,
+				"indefinite":false,
+				"split":false,
+				"vibration":true,
+				"halfwayAlert":false,
+				"duration":it.duration,
+				"_type":"int",
+				"name": it.type + " - " + it.name
+			};
+			temp.intervals.push(temp1);
 		}
 		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
 		let blobUrl = (URL || webkitURL).createObjectURL(file);
