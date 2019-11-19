@@ -1,3 +1,4 @@
+let btn_builder = document.getElementById("btn-builder");
 let btn_process = document.getElementById("btn-process");
 let input_csv = document.getElementById("csv-upload");
 let opt_workout = document.getElementById("opt-workout");
@@ -32,6 +33,8 @@ let selectedWorkout = -1;
 let dur_audio = 0, cur_time = 0;
 let cur_interval = 0, cur_exercise = 0;
 let cur_start_time = 0, cur_duration = 0, cur_end_time = 0;
+let csv_content = {};
+
 input_csv.onchange = () => {
 	opt_workout.length = 0;
 	workouts = [];
@@ -119,7 +122,8 @@ function btnProcessClicked() {
 		xHttp.open("GET", workouts[selectedIndex].live_data, true);
 		xHttp.addEventListener("load", () => {
 			if (xHttp.readyState == 4 && xHttp.status == 200) {
-				intervals = JSON.parse(xHttp.responseText).intervals;
+				csv_content = JSON.parse(xHttp.responseText);
+				intervals = csv_content.intervals;
 				console.log(intervals)
 				cont_exercises.innerHTML = "";
 				let temp = 0;
@@ -321,11 +325,30 @@ btn_add_exercise.addEventListener("click", () => {
 });
 btn_save.addEventListener("click", () => {
 	if (cur_interval > 0) {
-		intervals[cur_interval].start_time = input_start_time.value;
-		intervals[cur_interval - 1].end_time = input_start_time.value;
+		intervals[cur_interval].start_time = cur_start_time;
+		intervals[cur_interval - 1].end_time = cur_start_time;
+		intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
+		document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
 	}
-	intervals[cur_interval].end_time = input_end_time.value;
+	intervals[cur_interval].end_time = cur_end_time;
+	intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
+	document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
 	if (cur_interval < intervals.length - 1) {
-		intervals[cur_interval + 1].start_time = input_end_time.value;
+		intervals[cur_interval + 1].start_time = cur_end_time;
+		intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
+		document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
 	}
 });
+btn_save_all.addEventListener("click", () => {
+	let temp = {};
+	Object.assign(temp, csv_content);
+	for (it of temp.intervals) {
+		delete it.start_time;
+		delete it.end_time;
+		
+	}
+	console.log(JSON.stringify(temp, null, "   "))
+	let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
+	let blobUrl = (URL || webkitURL).createObjectURL(file);
+	window.location = blobUrl;
+})
