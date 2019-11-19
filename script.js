@@ -345,10 +345,9 @@ btn_save_all.addEventListener("click", () => {
 	for (it of temp.intervals) {
 		delete it.start_time;
 		delete it.end_time;
-		
 	}
 	console.log(JSON.stringify(temp, null, "   "))
 	let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
 	let blobUrl = (URL || webkitURL).createObjectURL(file);
 	window.location = blobUrl;
-})
+});
