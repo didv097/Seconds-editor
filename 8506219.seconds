@@ -20,7 +20,7 @@
          "halfwayAlert":false,
          "duration":30,
          "_type":"int",
-         "name":"Intro"
+         "name":"intro - Intro"
       },
       { 
          "splitRest":0,
@@ -40,7 +40,7 @@
          "halfwayAlert":false,
          "duration":20,
          "_type":"int",
-         "name":"Hamstrings Standing Stretch"
+         "name":"exercise - Hamstrings Standing Stretch"
       },
       { 
          "splitRest":0,
@@ -60,7 +60,7 @@
          "halfwayAlert":false,
          "duration":15,
          "_type":"int",
-         "name":"Rest"
+         "name":"rest - Rest"
       },
       { 
          "splitRest":0,
@@ -80,7 +80,7 @@
          "halfwayAlert":false,
          "duration":20,
          "_type":"int",
-         "name":"Quadriceps Seated Stretch"
+         "name":"exercise - Quadriceps Seated Stretch"
       },
       { 
          "splitRest":0,
@@ -100,7 +100,7 @@
          "halfwayAlert":false,
          "duration":15,
          "_type":"int",
-         "name":"Rest"
+         "name":"rest - Rest"
       },
       { 
          "splitRest":0,
@@ -120,7 +120,7 @@
          "halfwayAlert":false,
          "duration":20,
          "_type":"int",
-         "name":"Supine Knee To Chest Stretch"
+         "name":"exercise - Supine Knee To Chest Stretch"
       },
       { 
          "splitRest":0,
@@ -140,7 +140,7 @@
          "halfwayAlert":false,
          "duration":15,
          "_type":"int",
-         "name":"Rest"
+         "name":"rest - Rest"
       },
       { 
          "splitRest":0,
@@ -160,7 +160,7 @@
          "halfwayAlert":false,
          "duration":20,
          "_type":"int",
-         "name":"Childs Pose"
+         "name":"exercise - Childs Pose"
       },
       { 
          "splitRest":0,
@@ -180,7 +180,7 @@
          "halfwayAlert":false,
          "duration":30,
          "_type":"int",
-         "name":"Outro"
+         "name":"outro - Outro"
       }
    ],
    "numberOfSets":9,

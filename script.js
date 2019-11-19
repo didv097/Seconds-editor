@@ -135,9 +135,14 @@ function btnProcessClicked() {
 						break;
 					}
 					intervals[i].end_time = temp;
+					let type_name = intervals[i].name.split(" - ");
+					intervals[i].type = type_name[0].toLowerCase();
+					intervals[i].name = type_name[1];
 					let elem_interval = document.createElement("div");
 					elem_interval.classList = ["exercise"];
-					// elem_interval.classList.add("intro");
+					if (intervals[i].type != "exercise") {
+						elem_interval.classList.add(intervals[i].type);
+					}
 					elem_interval.style.width = (intervals[i].duration / dur_audio * 100) + "%";
 					elem_interval.id = "exercise-" + i;
 					let elem_icon = document.createElement("span");
@@ -356,7 +361,6 @@ input_end_time.oninput = () => {
 /* --------------------------- builder ------------------------------ */
 
 btn_builder.addEventListener("click", () => {
-	return;
 	cont_file_upload.style.display = "none";
 	cont_browser.style.display = "block";
 	document.getElementById("btn-previous").parentElement.parentElement.style.display = "none";
@@ -368,4 +372,4 @@ btn_builder.addEventListener("click", () => {
 
 	btn_add_exercise.onclick = () => {
 	}
-})
+});
