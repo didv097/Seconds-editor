@@ -28,6 +28,7 @@ let btn_add_rest = document.getElementById("btn-add-rest");
 let btn_add_intro = document.getElementById("btn-add-intro");
 let btn_add_outro = document.getElementById("btn-add-outro");
 
+let selectedIndex;
 let audio;
 let workouts = []; // id, name, mp3, live_data
 let intervals = [];	// type, name, duration, start, end
@@ -369,6 +370,13 @@ function btnProcessClicked() {
 			};
 			temp.intervals.push(temp1);
 		}
+		// let xHttp = new XMLHttpRequest();
+		// xHttp.open("PUT", workouts[selectedIndex].live_data, true);
+		// let blob = new Blob([JSON.stringify(temp, null, "   ")], {type: "application/json"});
+		// xHttp.onload = () => {
+		// 	console.log(xHttp.response)
+		// }
+		// xHttp.send(blob);
 		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
 		let blobUrl = (URL || webkitURL).createObjectURL(file);
 		window.location = blobUrl;
