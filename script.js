@@ -24,6 +24,9 @@ let btn_next = document.getElementById("btn-next");
 let btn_save = document.getElementById("btn-save");
 let btn_save_all = document.getElementById("btn-save-all");
 let btn_add_exercise = document.getElementById("btn-add-exercise");
+let btn_add_rest = document.getElementById("btn-add-rest");
+let btn_add_intro = document.getElementById("btn-add-intro");
+let btn_add_outro = document.getElementById("btn-add-outro");
 
 let audio;
 let workouts = []; // id, name, mp3, live_data
@@ -197,7 +200,7 @@ function btnProcessClicked() {
 			text_exercise.innerText = intervals[cur_interval].name;
 		}
 	};
-	btn_add_exercise.onclick = () => {
+	function addExercise(type) {
 		let new_idx = intervals.length;
 		let remaning_time, start_time;
 		if (new_idx == 0) {
@@ -211,7 +214,8 @@ function btnProcessClicked() {
 			return;
 		}
 		let new_interval = {
-			name: "Exercise",
+			name: type,
+			type: type.toLowerCase(),
 			start_time: start_time,
 			duration: Math.min(remaning_time, 20)
 		};
@@ -219,6 +223,9 @@ function btnProcessClicked() {
 		intervals.push(new_interval);
 		let elem_interval = document.createElement("div");
 		elem_interval.classList = ["exercise"];
+		if (type != "exercise") {
+			elem_interval.classList.add(type.toLowerCase());
+		}
 		elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
 		elem_interval.id = "exercise-" + new_idx;
 		let elem_icon = document.createElement("span");
@@ -238,9 +245,23 @@ function btnProcessClicked() {
 		elem_interval.appendChild(elem_icon);
 		elem_interval.appendChild(elem_name);
 		cont_exercises.appendChild(elem_interval);
+	}
+	btn_add_exercise.onclick = () => {
+		addExercise("Exercise");
+	};
+	btn_add_rest.onclick = () => {
+		addExercise("Rest");
+	};
+	btn_add_intro.onclick = () => {
+		addExercise("Intro");
+	};
+	btn_add_outro.onclick = () => {
+		addExercise("Outro");
 	};
 	btn_match.onclick = () => {
-		cur_exercise = -1;
+		intervals[cur_interval].name = opt_exercises.value;
+		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+/*		cur_exercise = -1;
 		for (let i = 0; i < exercises.length; i ++) {
 			if (exercises[i].name == intervals[cur_interval].name) {
 				cur_exercise = i;
@@ -260,6 +281,7 @@ function btnProcessClicked() {
 		} else {
 			opt_exercises.value = exercises[cur_exercise].name;
 		}
+*/
 	};
 	let updateIntervals = () => {
 		if (cur_interval > 0) {
