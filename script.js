@@ -198,9 +198,11 @@ function btnProcessClicked() {
 			text_exercise.innerText = intervals[cur_interval].name;
 		}
 		btn_match.className = "btn btn-danger";
+		btn_match.innerText = "Not match";
 		for (ex in exercises) {
 			if (intervals[cur_interval].name == ex.name) {
 				btn_match.className = "btn btn-success";
+				btn_match.innerText = "Match";
 			}
 		}
 	};
