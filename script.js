@@ -277,16 +277,6 @@ input_end_time.addEventListener("change", () => {
 	cur_duration = cur_end_time - cur_start_time;
 	input_duration.value = cur_duration;
 });
-btn_save.addEventListener("click", () => {
-	if (cur_interval > 0) {
-		intervals[cur_interval].start_time = input_start_time.value;
-		intervals[cur_interval - 1].end_time = input_start_time.value;
-	}
-	intervals[cur_interval].end_time = input_end_time.value;
-	if (cur_interval < intervals.length - 1) {
-		intervals[cur_interval + 1].start_time = input_end_time.value;
-	}
-});
 btn_add_exercise.addEventListener("click", () => {
   let new_idx = intervals.length;
   let remaning_time = dur_audio - intervals[new_idx - 1].end_time;
@@ -321,4 +311,14 @@ btn_add_exercise.addEventListener("click", () => {
   elem_interval.appendChild(elem_icon);
   elem_interval.appendChild(elem_name);
   cont_exercises.appendChild(elem_interval);
-})
+});
+btn_save.addEventListener("click", () => {
+	if (cur_interval > 0) {
+		intervals[cur_interval].start_time = input_start_time.value;
+		intervals[cur_interval - 1].end_time = input_start_time.value;
+	}
+	intervals[cur_interval].end_time = input_end_time.value;
+	if (cur_interval < intervals.length - 1) {
+		intervals[cur_interval + 1].start_time = input_end_time.value;
+	}
+});
