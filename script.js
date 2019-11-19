@@ -261,32 +261,7 @@ function btnProcessClicked() {
 			opt_exercises.value = exercises[cur_exercise].name;
 		}
 	};
-	input_start_time.onchange = () => {
-		if (cur_interval <= 0) {
-			input_start_time.value = 0;
-			input_duration.value = cur_end_time;
-			return;
-		}
-		if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
-			input_start_time.value = cur_start_time;
-		}
-		cur_start_time = input_start_time.value;
-		cur_duration = cur_end_time - cur_start_time;
-		input_duration.value = cur_duration;
-	};
-	input_end_time.onchange = () => {
-		if (cur_interval >= intervals.length - 1) {
-			input_end_time.value = cur_end_time;
-			return;
-		}
-		if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
-			input_end_time.value = cur_end_time;
-		}
-		cur_end_time = input_end_time.value;
-		cur_duration = cur_end_time - cur_start_time;
-		input_duration.value = cur_duration;
-	};
-	btn_save.onclick = () => {
+	let updateIntervals = () => {
 		if (cur_interval > 0) {
 			intervals[cur_interval].start_time = cur_start_time;
 			intervals[cur_interval - 1].end_time = cur_start_time;
@@ -301,6 +276,42 @@ function btnProcessClicked() {
 			intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
 			document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
 		}
+	}
+	input_start_time.onchange = () => {
+		if (cur_interval <= 0) {
+			input_start_time.value = 0;
+			input_duration.value = cur_end_time;
+			return;
+		}
+		if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
+			input_start_time.value = cur_start_time;
+		}
+		cur_start_time = Number(input_start_time.value);
+		cur_duration = cur_end_time - cur_start_time;
+		input_duration.value = cur_duration;
+		updateIntervals();
+	};
+	input_duration.onchange = () => {
+		cur_duration = Number(input_duration.value);
+		cur_end_time = cur_start_time + cur_duration;
+		input_end_time.value = cur_end_time;
+		updateIntervals();
+	};
+	input_end_time.onchange = () => {
+		if (cur_interval >= intervals.length - 1) {
+			input_end_time.value = cur_end_time;
+			return;
+		}
+		if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
+			input_end_time.value = cur_end_time;
+		}
+		cur_end_time = Number(input_end_time.value);
+		cur_duration = cur_end_time - cur_start_time;
+		input_duration.value = cur_duration;
+		updateIntervals();
+	};
+	btn_save.onclick = () => {
+		updateIntervals();
 	};
 	btn_save_all.onclick = () => {
 		let temp = {};
@@ -320,13 +331,13 @@ btn_process.onclick = () => btnProcessClicked();
 btn_play.onclick = () => {
 	audio.play();
 	input_start_time.readOnly = true;
-	// input_duration.readOnly = true;
+	input_duration.readOnly = true;
 	input_end_time.readOnly = true;
 };
 btn_pause.onclick = () => {
 	audio.pause();
 	input_start_time.readOnly = false;
-	// input_duration.readOnly = false;
+	input_duration.readOnly = false;
 	input_end_time.readOnly = false;
 };
 btn_back10.onclick = () => {
@@ -353,6 +364,9 @@ btn_next.onclick = () => {
 };
 input_start_time.oninput = () => {
 	input_duration.value = input_end_time.value - input_start_time.value;
+};
+input_duration.oninput = () => {
+	input_end_time.value = cur_start_time + Number(input_duration.value);
 };
 input_end_time.oninput = () => {
 	input_duration.value = input_end_time.value - input_start_time.value;
