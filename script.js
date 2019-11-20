@@ -1,32 +1,34 @@
+let cont_file_upload = document.getElementById("cont-file-upload");
+let cont_browser = document.getElementById("cont-browser");
+
 let btn_builder = document.getElementById("btn-builder");
 let btn_process = document.getElementById("btn-process");
 let input_csv = document.getElementById("csv-upload");
 let opt_workout = document.getElementById("opt-workout");
-let progressbar = document.getElementById("progress-bar");
-let elem_cur_time = document.getElementById("cur-playback");
-let cont_exercises = document.getElementById("cont-exercises");
-let cont_file_upload = document.getElementById("cont-file-upload");
-let cont_browser = document.getElementById("cont-browser");
-let elem_workout_id = document.getElementById("workout-id");
-let elem_workout_name = document.getElementById("workout-name");
+
+let btn_previous = document.getElementById("btn-previous");
+let btn_next = document.getElementById("btn-next");
+let text_workout_id = document.getElementById("workout-id");
+let text_workout_name = document.getElementById("workout-name");
 let btn_back10 = document.getElementById("btn-back10s");
 let btn_play = document.getElementById("btn-play");
-let btn_forward10 = document.getElementById("btn-forward10s");
 let btn_pause = document.getElementById("btn-pause");
+let btn_forward10 = document.getElementById("btn-forward10s");
+let text_cur_time = document.getElementById("cur-playback");
+let progressbar = document.getElementById("progress-bar");
+let cont_exercises = document.getElementById("cont-exercises");
+let btn_add_exercise = document.getElementById("btn-add-exercise");
+let btn_add_rest = document.getElementById("btn-add-rest");
+let btn_add_intro = document.getElementById("btn-add-intro");
+let btn_add_outro = document.getElementById("btn-add-outro");
+let text_exercise = document.getElementById("text-exercise");
 let opt_exercises = document.getElementById("opt-exercises");
 let btn_match = document.getElementById("btn-match");
 let input_start_time = document.getElementById("input-start-time");
 let input_duration = document.getElementById("input-duration");
 let input_end_time = document.getElementById("input-end-time");
-let text_exercise = document.getElementById("text-exercise");
-let btn_previous = document.getElementById("btn-previous");
-let btn_next = document.getElementById("btn-next");
 let btn_save = document.getElementById("btn-save");
 let btn_save_all = document.getElementById("btn-save-all");
-let btn_add_exercise = document.getElementById("btn-add-exercise");
-let btn_add_rest = document.getElementById("btn-add-rest");
-let btn_add_intro = document.getElementById("btn-add-intro");
-let btn_add_outro = document.getElementById("btn-add-outro");
 
 let selectedIndex;
 let audio;
@@ -83,16 +85,19 @@ xHttpCSV.addEventListener("load", () => {
 	}
 });
 xHttpCSV.send(null);
+function getIntervalElement(idx) {
+	return document.getElementById("exercise-" + idx);
+}
 function removeInterval(idx) {
 	if (idx < intervals.length - 1) {
 		for (let j = idx + 1; j < intervals.length; j ++) {
 			intervals[j].start_time -= intervals[idx].duration;
 			intervals[j].end_time -= intervals[idx].duration;
-			document.getElementById("exercise-" + j).id = "exercise-" + (j - 1);
+			getIntervalElement(j).id = "exercise-" + (j - 1);
 		}
 	}
 	intervals.splice(idx, 1);
-	cont_exercises.removeChild(document.getElementById("exercise-" + idx));
+	cont_exercises.removeChild(getIntervalElement(idx));
 }
 function gotoInterval(idx) {
 	// cur_interval = idx;
@@ -108,15 +113,15 @@ function updateIntervals() {
 		intervals[cur_interval].start_time = cur_start_time;
 		intervals[cur_interval - 1].end_time = cur_start_time;
 		intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
-		document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
+		getIntervalElement(cur_interval - 1).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
 	}
 	intervals[cur_interval].end_time = cur_end_time;
 	intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
-	document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
+	getIntervalElement(cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
 	if (cur_interval < intervals.length - 1) {
 		intervals[cur_interval + 1].start_time = cur_end_time;
 		intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
-		document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
+		getIntervalElement(cur_interval + 1).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
 	}
 }
 
@@ -154,8 +159,8 @@ function btnProcessClicked() {
 	cont_file_upload.style.display = "none";
 	cont_browser.style.display = "block";
 
-	elem_workout_id.innerText = workouts[selectedIndex].id;
-	elem_workout_name.innerText = workouts[selectedIndex].name;
+	text_workout_id.innerText = workouts[selectedIndex].id;
+	text_workout_name.innerText = workouts[selectedIndex].name;
 
 
 
@@ -246,7 +251,7 @@ function btnProcessClicked() {
 	});
 	audio.ontimeupdate = () => {
 		cur_time = audio.currentTime;
-		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
+		text_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
 		progressbar.style.width = (100 * cur_time / dur_audio) + "%";
 		let i;
@@ -294,7 +299,7 @@ function btnProcessClicked() {
 			return;
 		}
 		intervals[cur_interval].name = opt_exercises.value;
-		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+		getIntervalElement(cur_interval).children[1].innerText = opt_exercises.value;
 	}
 	function addExercise(type) {
 		let new_idx = intervals.length;
@@ -636,7 +641,7 @@ btn_builder.addEventListener("click", () => {
 			return;
 		}
 		intervals[cur_interval].name = opt_exercises.value;
-		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+		getIntervalElement(cur_interval).children[1].innerText = opt_exercises.value;
 		gotoInterval(cur_interval);
 	}
 	btn_save.onclick = btn_save_all.onclick = () => {
