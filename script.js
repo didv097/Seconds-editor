@@ -162,8 +162,6 @@ function btnProcessClicked() {
 	text_workout_id.innerText = workouts[selectedIndex].id;
 	text_workout_name.innerText = workouts[selectedIndex].name;
 
-
-
 	audio = new Audio(workouts[selectedIndex].mp3);
 	audio.addEventListener("loadeddata", () => {
 		dur_audio = parseInt(audio.duration);
@@ -234,19 +232,21 @@ function btnProcessClicked() {
 							return;
 						}
 						drag_x = event.x;
+						document.body.style.cursor = "col-resize";
 						cont_exercises.onmousemove = (event1) => {
 							resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 							drag_x = event1.x;
 						}
 						cont_exercises.onmouseup = () => {
 							cont_exercises.onmousemove = () => {};
+							document.body.style.cursor = "auto";
 							finishResizeInterval(idx);
 						}
 					}
 					cont_exercises.appendChild(elem_interval);
 				}
 			}
-		})
+		});
 		xHttp.send(null);
 	});
 	audio.ontimeupdate = () => {
@@ -360,6 +360,7 @@ function btnProcessClicked() {
 				return;
 			}
 			drag_x = event.x;
+			document.body.style.cursor = "col-resize";
 			cont_exercises.onmousemove = (event1) => {
 				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
@@ -612,11 +613,13 @@ btn_builder.addEventListener("click", () => {
 				return;
 			}
 			drag_x = event.x;
+			document.body.style.cursor = "col-resize";
 			cont_exercises.onmousemove = (event1) => {
 				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
 			}
 			cont_exercises.onmouseup = () => {
+				document.body.style.cursor = "auto";
 				cont_exercises.onmousemove = () => {};
 				finishResizeInterval(idx);
 			}
