@@ -185,6 +185,7 @@ function btnProcessClicked() {
 			}
 		}
 		if (i >= intervals.length) {
+			cur_interval = -1;
 			cur_start_time = 0;
 			cur_duration = 0;
 			cur_end_time = 0;
@@ -205,7 +206,7 @@ function btnProcessClicked() {
 		btn_match.innerText = "Not match";
 		opt_exercises.value = "";
 		for (ex of exercises) {
-			if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
+			if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
 				btn_match.className = "btn btn-success";
 				btn_match.innerText = "Match";
 				opt_exercises.value = ex.name;
@@ -214,7 +215,7 @@ function btnProcessClicked() {
 		}
 	};
 	opt_exercises.onchange = () => {
-		if (opt_exercises == "") {
+		if (opt_exercises == "" || cur_interval < 0) {
 			return;
 		}
 		intervals[cur_interval].name = opt_exercises.value;
@@ -279,6 +280,9 @@ function btnProcessClicked() {
 		addExercise("Outro");
 	};
 	let updateIntervals = () => {
+		if (cur_interval < 0) {
+			return;
+		}
 		if (cur_interval > 0) {
 			intervals[cur_interval].start_time = cur_start_time;
 			intervals[cur_interval - 1].end_time = cur_start_time;
@@ -295,6 +299,9 @@ function btnProcessClicked() {
 		}
 	}
 	input_start_time.onchange = () => {
+		if (cur_interval < 0) {
+			return;
+		}
 		if (cur_interval <= 0) {
 			input_start_time.value = 0;
 			input_duration.value = cur_end_time;
@@ -309,12 +316,18 @@ function btnProcessClicked() {
 		updateIntervals();
 	};
 	input_duration.onchange = () => {
+		if (cur_interval < 0) {
+			return;
+		}
 		cur_duration = Number(input_duration.value);
 		cur_end_time = cur_start_time + cur_duration;
 		input_end_time.value = cur_end_time;
 		updateIntervals();
 	};
 	input_end_time.onchange = () => {
+		if (cur_interval < 0) {
+			return;
+		}
 		if (cur_interval >= intervals.length - 1) {
 			input_end_time.value = cur_end_time;
 			return;
