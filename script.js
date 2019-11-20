@@ -450,9 +450,139 @@ btn_builder.addEventListener("click", () => {
 	document.getElementById("btn-back10s").parentElement.style.display = "none";
 	document.getElementById("cur-playback").style.display = "none";
 	document.getElementsByClassName("progress")[0].style.display = "none";
+	input_start_time.readOnly = false;
+	input_duration.readOnly = false;
+	input_end_time.readOnly = false;
+	opt_exercises.selectedIndex = -1;
 	intervals = [];
 	cont_exercises.innerHTML = "";
+	dur_audio = 120;
+	cur_interval = -1;
 
+	function gotoInterval(idx) {
+		cur_interval = idx;
+		if (cur_interval < 0) {
+			return;
+		}
+		text_exercise.innerText = intervals[cur_interval].name;
+		cur_start_time = intervals[cur_interval].start_time;
+		cur_duration = intervals[cur_interval].duration;
+		cur_end_time = intervals[cur_interval].end_time;
+		input_start_time.value = cur_start_time;
+		input_duration.value = cur_duration;
+		input_end_time.value = cur_end_time;
+		btn_match.className = "btn btn-danger";
+		btn_match.innerText = "Not match";
+		opt_exercises.value = "";
+		for (ex of exercises) {
+			if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
+				btn_match.className = "btn btn-success";
+				btn_match.innerText = "Match";
+				opt_exercises.value = ex.name;
+				break;
+			}
+		}
+	}
+	function addExercise(type) {
+		cur_interval = intervals.length;
+		let new_interval = {
+			name: type,
+			type: type.toLowerCase(),
+			start_time: cur_interval == 0 ? 0 : intervals[cur_interval - 1].end_time,
+			duration: 20
+		};
+		new_interval.end_time = new_interval.start_time + new_interval.duration;
+		intervals.push(new_interval);
+		let elem_interval = document.createElement("div");
+		elem_interval.classList = ["exercise"];
+		if (type != "exercise") {
+			elem_interval.classList.add(type.toLowerCase());
+		}
+		elem_interval.style.width = (new_interval.duration / dur_audio * 100) + "%";
+		elem_interval.id = "exercise-" + cur_interval;
+		let elem_icon = document.createElement("span");
+		elem_icon.className = "exer-icon";
+		elem_icon.innerHTML = "&#x1f5d1;";
+		elem_icon.onclick = () => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			removeInterval(idx);
+		};
+		let elem_name = document.createElement("span");
+		elem_name.className = "exer-name";
+		elem_name.innerHTML = new_interval.name;
+		elem_name.onclick = () => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			gotoInterval(idx);
+		};
+		elem_interval.appendChild(elem_icon);
+		elem_interval.appendChild(elem_name);
+		cont_exercises.appendChild(elem_interval);
+		gotoInterval(cur_interval);
+	}
 	btn_add_exercise.onclick = () => {
+		addExercise("Exercise");
+	}
+	btn_add_rest.onclick = () => {
+		addExercise("Rest");
+	}
+	btn_add_intro.onclick = () => {
+		addExercise("Intro");
+	}
+	btn_add_outro.onclick = () => {
+		addExercise("Outro");
+	}
+	opt_exercises.onchange = () => {
+		if (opt_exercises == "" || cur_interval < 0) {
+			return;
+		}
+		intervals[cur_interval].name = opt_exercises.value;
+		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+	}
+	btn_save.onclick = btn_save_all.onclick = () => {
+		let temp = {
+			"overrun": false,
+			"lastPerformedTimeInterval": 0,
+			"intervals": [],
+			"numberOfSets": 9,
+			"_type": "cust",
+			"soundScheme": 1,
+			"music":{
+					"_type": "music",
+					"shuffle": false,
+					"volume": 1,
+					"resume": true,
+					"persist": false
+			},
+			"type": 0,
+			"identifier": "192D054A-B056-45FB-ADC4-10CE40E2F117",
+			"name": "Cool Down 1",
+			"activity": 0
+		}
+		for (let it of intervals) {
+			let temp1 = {
+				"splitRest": 0,
+				"ducked": false,
+				"rest": false,
+				"music":{ 
+					"_type":"music",
+					"shuffle":false,
+					"volume":1,
+					"resume":false,
+					"persist":false
+				},
+				"color":0,
+				"indefinite":false,
+				"split":false,
+				"vibration":true,
+				"halfwayAlert":false,
+				"duration":it.duration,
+				"_type":"int",
+				"name": it.type + " - " + it.name
+			};
+			temp.intervals.push(temp1);
+		}
+		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
+		let blobUrl = (URL || webkitURL).createObjectURL(file);
+		window.location = blobUrl;
 	}
 });
