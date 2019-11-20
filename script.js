@@ -138,55 +138,12 @@ function finishResizeInterval(idx) {
 		intervals[idx + 1].start_time = intervals[idx].end_time;
 		intervals[idx + 1].duration = intervals[idx + 1].end_time - intervals[idx + 1].start_time;
 	}
-	cur_interval = -1;
-	console.log("finish")
-	timeUpdate();
-}
-
-function timeUpdate() {
-	cur_time = audio.currentTime;
-	elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
-		+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
-	progressbar.style.width = (100 * cur_time / dur_audio) + "%";
-	let i;
-	for (i = 0; i < intervals.length; i ++) {
-		if (cur_time < intervals[i].end_time) {
-			if (cur_interval == i) {
-				return;
-			}
-			cur_interval = i;
-			break;
-		}
-	}
-	if (i >= intervals.length) {
-		cur_interval = -1;
-		cur_start_time = 0;
-		cur_duration = 0;
-		cur_end_time = 0;
-		input_start_time.value = 0;
-		input_duration.value = 0;
-		input_end_time.value = 0;
-		text_exercise.innerText = "";
-	} else {
-		cur_start_time = intervals[cur_interval].start_time;
-		cur_duration = intervals[cur_interval].duration;
-		cur_end_time = intervals[cur_interval].end_time;
-		input_start_time.value = cur_start_time;
-		input_duration.value = cur_duration;
-		input_end_time.value = cur_end_time;
-		text_exercise.innerText = intervals[cur_interval].name;
-	}
-	btn_match.className = "btn btn-danger";
-	btn_match.innerText = "Not match";
-	opt_exercises.value = "";
-	for (ex of exercises) {
-		if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
-			btn_match.className = "btn btn-success";
-			btn_match.innerText = "Match";
-			opt_exercises.value = ex.name;
-			break;
-		}
-	}
+	cur_start_time = intervals[cur_interval].start_time;
+	cur_duration = intervals[cur_interval].duration;
+	cur_end_time = intervals[cur_interval].end_time;
+	input_start_time.value = cur_start_time;
+	input_duration.value = cur_duration;
+	input_end_time.value = cur_end_time;
 }
 
 function btnProcessClicked() {
@@ -288,7 +245,49 @@ function btnProcessClicked() {
 		xHttp.send(null);
 	});
 	audio.ontimeupdate = () => {
-		timeUpdate();
+		cur_time = audio.currentTime;
+		elem_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
+			+ ":" + ("00" + parseInt(cur_time % 60).toString()).slice(-2);
+		progressbar.style.width = (100 * cur_time / dur_audio) + "%";
+		let i;
+		for (i = 0; i < intervals.length; i ++) {
+			if (cur_time < intervals[i].end_time) {
+				if (cur_interval == i) {
+					return;
+				}
+				cur_interval = i;
+				break;
+			}
+		}
+		if (i >= intervals.length) {
+			cur_interval = -1;
+			cur_start_time = 0;
+			cur_duration = 0;
+			cur_end_time = 0;
+			input_start_time.value = 0;
+			input_duration.value = 0;
+			input_end_time.value = 0;
+			text_exercise.innerText = "";
+		} else {
+			cur_start_time = intervals[cur_interval].start_time;
+			cur_duration = intervals[cur_interval].duration;
+			cur_end_time = intervals[cur_interval].end_time;
+			input_start_time.value = cur_start_time;
+			input_duration.value = cur_duration;
+			input_end_time.value = cur_end_time;
+			text_exercise.innerText = intervals[cur_interval].name;
+		}
+		btn_match.className = "btn btn-danger";
+		btn_match.innerText = "Not match";
+		opt_exercises.value = "";
+		for (ex of exercises) {
+			if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
+				btn_match.className = "btn btn-success";
+				btn_match.innerText = "Match";
+				opt_exercises.value = ex.name;
+				break;
+			}
+		}
 	};
 	opt_exercises.onchange = () => {
 		if (opt_exercises == "" || cur_interval < 0) {
