@@ -98,6 +98,26 @@ function gotoInterval(idx) {
 	cur_time = intervals[cur_interval].start_time;
 	audio.currentTime = cur_time;
 }
+
+function updateIntervals() {
+	if (cur_interval < 0) {
+		return;
+	}
+	if (cur_interval > 0) {
+		intervals[cur_interval].start_time = cur_start_time;
+		intervals[cur_interval - 1].end_time = cur_start_time;
+		intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
+		document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
+	}
+	intervals[cur_interval].end_time = cur_end_time;
+	intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
+	document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
+	if (cur_interval < intervals.length - 1) {
+		intervals[cur_interval + 1].start_time = cur_end_time;
+		intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
+		document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
+	}
+}
 function btnProcessClicked() {
 	selectedIndex = opt_workout.selectedIndex;
 	if (selectedIndex < 0) {
@@ -279,67 +299,6 @@ function btnProcessClicked() {
 	btn_add_outro.onclick = () => {
 		addExercise("Outro");
 	};
-	let updateIntervals = () => {
-		if (cur_interval < 0) {
-			return;
-		}
-		if (cur_interval > 0) {
-			intervals[cur_interval].start_time = cur_start_time;
-			intervals[cur_interval - 1].end_time = cur_start_time;
-			intervals[cur_interval - 1].duration = cur_start_time - intervals[cur_interval - 1].start_time;
-			document.getElementById("exercise-" + (cur_interval - 1)).style.width = (intervals[cur_interval - 1].duration / dur_audio * 100) + "%";
-		}
-		intervals[cur_interval].end_time = cur_end_time;
-		intervals[cur_interval].duration = cur_end_time - intervals[cur_interval].start_time;
-		document.getElementById("exercise-" + cur_interval).style.width = (intervals[cur_interval].duration / dur_audio * 100) + "%";
-		if (cur_interval < intervals.length - 1) {
-			intervals[cur_interval + 1].start_time = cur_end_time;
-			intervals[cur_interval + 1].duration =intervals[cur_interval + 1].end_time - cur_end_time;
-			document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
-		}
-	}
-	input_start_time.onchange = () => {
-		if (cur_interval < 0) {
-			return;
-		}
-		if (cur_interval <= 0) {
-			input_start_time.value = 0;
-			input_duration.value = cur_end_time;
-			return;
-		}
-		if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
-			input_start_time.value = cur_start_time;
-		}
-		cur_start_time = Number(input_start_time.value);
-		cur_duration = cur_end_time - cur_start_time;
-		input_duration.value = cur_duration;
-		updateIntervals();
-	};
-	input_duration.onchange = () => {
-		if (cur_interval < 0) {
-			return;
-		}
-		cur_duration = Number(input_duration.value);
-		cur_end_time = cur_start_time + cur_duration;
-		input_end_time.value = cur_end_time;
-		updateIntervals();
-	};
-	input_end_time.onchange = () => {
-		if (cur_interval < 0) {
-			return;
-		}
-		if (cur_interval >= intervals.length - 1) {
-			input_end_time.value = cur_end_time;
-			return;
-		}
-		if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
-			input_end_time.value = cur_end_time;
-		}
-		cur_end_time = Number(input_end_time.value);
-		cur_duration = cur_end_time - cur_start_time;
-		input_duration.value = cur_duration;
-		updateIntervals();
-	};
 	btn_save.onclick = btn_save_all.onclick = () => {
 		let temp = {
 			"overrun": csv_content.overrun,
@@ -396,6 +355,48 @@ function btnProcessClicked() {
 	};
 	/* btnProcessClicked() */
 }
+input_start_time.onchange = () => {
+	if (cur_interval < 0) {
+		return;
+	}
+	if (cur_interval <= 0) {
+		input_start_time.value = 0;
+		input_duration.value = cur_end_time;
+		return;
+	}
+	if (input_start_time.value >= cur_end_time || input_start_time.value <= intervals[cur_interval - 1].start_time) {
+		input_start_time.value = cur_start_time;
+	}
+	cur_start_time = Number(input_start_time.value);
+	cur_duration = cur_end_time - cur_start_time;
+	input_duration.value = cur_duration;
+	updateIntervals();
+};
+input_duration.onchange = () => {
+	if (cur_interval < 0) {
+		return;
+	}
+	cur_duration = Number(input_duration.value);
+	cur_end_time = cur_start_time + cur_duration;
+	input_end_time.value = cur_end_time;
+	updateIntervals();
+};
+input_end_time.onchange = () => {
+	if (cur_interval < 0) {
+		return;
+	}
+	if (cur_interval >= intervals.length - 1) {
+		input_end_time.value = cur_end_time;
+		return;
+	}
+	if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
+		input_end_time.value = cur_end_time;
+	}
+	cur_end_time = Number(input_end_time.value);
+	cur_duration = cur_end_time - cur_start_time;
+	input_duration.value = cur_duration;
+	updateIntervals();
+};
 btn_process.onclick = () => btnProcessClicked();
 btn_play.onclick = () => {
 	audio.play();
