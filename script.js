@@ -38,6 +38,7 @@ let dur_audio = 0, cur_time = 0;
 let cur_interval = -1, cur_exercise = -1;
 let cur_start_time = 0, cur_duration = 0, cur_end_time = 0;
 let csv_content = {};
+let drag_x = 0;
 
 input_csv.onchange = () => {
 	opt_workout.length = 0;
@@ -94,8 +95,8 @@ function removeInterval(idx) {
 	cont_exercises.removeChild(document.getElementById("exercise-" + idx));
 }
 function gotoInterval(idx) {
-	cur_interval = idx;
-	cur_time = intervals[cur_interval].start_time;
+	// cur_interval = idx;
+	cur_time = intervals[idx].start_time;
 	audio.currentTime = cur_time;
 }
 
@@ -118,6 +119,18 @@ function updateIntervals() {
 		document.getElementById("exercise-" + (cur_interval + 1)).style.width = (intervals[cur_interval + 1].duration / dur_audio * 100) + "%";
 	}
 }
+
+function resizeInterval(idx, offT) {
+	intervals[idx].duration += offT;
+	intervals[idx].end_time += offT;
+	if (idx < intervals.length - 1) {
+		intervals[idx + 1].duration -= offT;
+		intervals[idx + 1].start_time += offT;
+		cont_exercises.children[idx + 1].style.width = intervals[idx + 1].duration / dur_audio * 100 + "%";
+	}
+	cont_exercises.children[idx].style.width = intervals[idx].duration / dur_audio * 100 + "%";
+}
+
 function btnProcessClicked() {
 	selectedIndex = opt_workout.selectedIndex;
 	if (selectedIndex < 0) {
@@ -172,18 +185,44 @@ function btnProcessClicked() {
 					elem_icon.innerHTML = "&#x1f5d1;";
 					elem_icon.onclick = (event) => {
 						let idx = Number(event.target.parentElement.id.slice(9));
-						removeInterval(idx);
+						if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+							removeInterval(idx);
+						}
 					};
 					let elem_name = document.createElement("span");
 					elem_name.className = "exer-name";
 					elem_name.innerHTML = intervals[i].name;
 					elem_name.onclick = (event) => {
 						let idx = Number(event.target.parentElement.id.slice(9));
-						gotoInterval(idx);
+						if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+							gotoInterval(idx);
+						}
 					};
 					elem_interval.appendChild(elem_icon);
 					elem_interval.appendChild(elem_name);
+					elem_interval.onmousedown = (event) => {
+						let idx = Number(event.target.parentElement.id.slice(9));
+						if (!(idx >= 0 && idx <intervals.length)) {
+							return;
+						}
+						if (event.offsetX < 5) {
+							if (idx == 0) {
+								return;
+							}
+							idx --;
+						} else if (event.target.offsetWidth - event.offsetX >= 5) {
+							return;
+						}
+						drag_x = event.x;
+						cont_exercises.onmousemove = (event1) => {
+							resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+							drag_x = event1.x;
+						}
+					}
 					cont_exercises.appendChild(elem_interval);
+					cont_exercises.onmouseup = () => {
+						cont_exercises.onmousemove = () => {};
+					}
 				}
 			}
 		})
@@ -274,17 +313,37 @@ function btnProcessClicked() {
 		elem_icon.innerHTML = "&#x1f5d1;";
 		elem_icon.onclick = () => {
 			let idx = Number(event.target.parentElement.id.slice(9));
-			removeInterval(idx);
+			if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+				removeInterval(idx);
+			}
 		};
 		let elem_name = document.createElement("span");
 		elem_name.className = "exer-name";
 		elem_name.innerHTML = new_interval.name;
 		elem_name.onclick = () => {
 			let idx = Number(event.target.parentElement.id.slice(9));
-			gotoInterval(idx);
+			if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+				gotoInterval(idx);
+			}
 		};
 		elem_interval.appendChild(elem_icon);
 		elem_interval.appendChild(elem_name);
+		elem_interval.onmousedown = (event) => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			if (event.offsetX < 5) {
+				if (idx == 0) {
+					return;
+				}
+				idx --;
+			} else if (event.target.offsetWidth - event.offsetX >= 5) {
+				return;
+			}
+			drag_x = event.x;
+			cont_exercises.onmousemove = (event1) => {
+				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+				drag_x = event1.x;
+			}
+		}
 		cont_exercises.appendChild(elem_interval);
 	}
 	btn_add_exercise.onclick = () => {
@@ -504,20 +563,43 @@ btn_builder.addEventListener("click", () => {
 		let elem_icon = document.createElement("span");
 		elem_icon.className = "exer-icon";
 		elem_icon.innerHTML = "&#x1f5d1;";
-		elem_icon.onclick = () => {
+		elem_icon.onclick = (event) => {
 			let idx = Number(event.target.parentElement.id.slice(9));
-			removeInterval(idx);
+			if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+				removeInterval(idx);
+			}
 		};
 		let elem_name = document.createElement("span");
 		elem_name.className = "exer-name";
 		elem_name.innerHTML = new_interval.name;
-		elem_name.onclick = () => {
+		elem_name.onclick = (event) => {
 			let idx = Number(event.target.parentElement.id.slice(9));
-			gotoInterval(idx);
+			if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+				gotoInterval(idx);
+			}
 		};
 		elem_interval.appendChild(elem_icon);
 		elem_interval.appendChild(elem_name);
+		elem_interval.onmousedown = (event) => {
+			let idx = Number(event.target.parentElement.id.slice(9));
+			if (event.offsetX < 5) {
+				if (idx == 0) {
+					return;
+				}
+				idx --;
+			} else if (event.target.offsetWidth - event.offsetX >= 5) {
+				return;
+			}
+			drag_x = event.x;
+			cont_exercises.onmousemove = (event1) => {
+				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+				drag_x = event1.x;
+			}
+		}
 		cont_exercises.appendChild(elem_interval);
+		cont_exercises.onmouseup = () => {
+			cont_exercises.onmousemove = () => {};
+		}
 		gotoInterval(cur_interval);
 	}
 	btn_add_exercise.onclick = () => {
@@ -538,6 +620,7 @@ btn_builder.addEventListener("click", () => {
 		}
 		intervals[cur_interval].name = opt_exercises.value;
 		document.getElementById("exercise-" + cur_interval).children[1].innerText = opt_exercises.value;
+		gotoInterval(cur_interval);
 	}
 	btn_save.onclick = btn_save_all.onclick = () => {
 		let temp = {
