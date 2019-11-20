@@ -220,7 +220,7 @@ function btnProcessClicked() {
 					elem_interval.appendChild(elem_name);
 					elem_interval.onmousedown = (event) => {
 						let idx = Number(event.target.parentElement.id.slice(9));
-						if (!(idx >= 0 && idx <intervals.length)) {
+						if (!(idx >= 0 && idx < intervals.length)) {
 							return;
 						}
 						if (event.offsetX < 5) {
@@ -351,6 +351,9 @@ function btnProcessClicked() {
 		elem_interval.appendChild(elem_name);
 		elem_interval.onmousedown = (event) => {
 			let idx = Number(event.target.parentElement.id.slice(9));
+			if (!(idx >= 0 && idx < intervals.length)) {
+				return;
+			}
 			if (event.offsetX < 5) {
 				if (idx == 0) {
 					return;
@@ -604,6 +607,9 @@ btn_builder.addEventListener("click", () => {
 		elem_interval.appendChild(elem_name);
 		elem_interval.onmousedown = (event) => {
 			let idx = Number(event.target.parentElement.id.slice(9));
+			if (!(idx >= 0 && idx < intervals.length)) {
+				return;
+			}
 			if (event.offsetX < 5) {
 				if (idx == 0) {
 					return;
