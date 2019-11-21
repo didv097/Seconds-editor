@@ -66,6 +66,11 @@ div {
 	text-align: right;
 }
 
+#text-exercise {
+	text-align: left;
+	user-select: none;
+}
+
 #btn-save-all {
 	width: 40%;
 	max-width: 300px;
