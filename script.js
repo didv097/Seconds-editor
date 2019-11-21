@@ -197,7 +197,11 @@ function btnProcessClicked() {
 	}
 	audio = new Audio(workouts[selectedIndex].mp3);
 	drag_idx = -1;
-	audio.addEventListener("loadeddata", () => {
+	audio.onerror = () => {
+		location.reload();
+		alert("Error loading audio");
+	}
+	audio.onloadeddata = () => {
 		dur_audio = parseInt(audio.duration);
 		document.getElementById("audio-duration").innerText = ("00" + parseInt(dur_audio / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(dur_audio % 60).toString()).slice(-2);
@@ -208,95 +212,100 @@ function btnProcessClicked() {
 		intervals = [];
 		let xHttp = new XMLHttpRequest();
 		xHttp.open("GET", workouts[selectedIndex].live_data, true);
-		xHttp.addEventListener("load", () => {
-			if (xHttp.readyState == 4 && xHttp.status == 200) {
-				json_content = JSON.parse(xHttp.responseText);
-				if (json_content.hasOwnProperty("overrun")) {
-					intervals = json_content.intervals;
+		xHttp.onreadystatechange = () => {
+			if (xHttp.readyState == 4) {
+				if (xHttp.status != 200) {
+					location.reload();
+					console.log("Error loading data");
 				} else {
-					intervals = json_content.packs[0].items[0].intervals;
-				}
-				cont_exercises.innerHTML = "";
-				let temp = 0;
-				for (let i = 0; i < intervals.length; i ++) {
-					intervals[i].start_time = temp;
-					temp += intervals[i].duration;
-					if (temp > dur_audio) {
-						intervals.length = i;
-						break;
+					json_content = JSON.parse(xHttp.responseText);
+					if (json_content.hasOwnProperty("overrun")) {
+						intervals = json_content.intervals;
+					} else {
+						intervals = json_content.packs[0].items[0].intervals;
 					}
-					intervals[i].end_time = temp;
-					intervals[i].type = intervals[i].name.toLowerCase();
-					if (intervals[i].type != "intro" && intervals[i].type != "outro" && intervals[i].type != "rest") {
-						intervals[i].type = "exercise";
-						let temp1 = intervals[i].name.indexOf(" - ");
-						console.log(temp1)
-						if (temp1 >= 0) {
-							intervals[i].id = intervals[i].name.slice(0, temp1);
-							intervals[i].name = intervals[i].name.slice(temp1 + 3);
-						} else {
-							intervals[i].id = getExerciseId(intervals[i].name);
+					cont_exercises.innerHTML = "";
+					let temp = 0;
+					for (let i = 0; i < intervals.length; i ++) {
+						intervals[i].start_time = temp;
+						temp += intervals[i].duration;
+						if (temp > dur_audio) {
+							intervals.length = i;
+							break;
 						}
-					}
-					let elem_interval = document.createElement("div");
-					elem_interval.classList = ["exercise"];
-					if (intervals[i].type != "exercise") {
-						elem_interval.classList.add(intervals[i].type);
-					}
-					elem_interval.style.width = (intervals[i].duration / dur_audio * 100) + "%";
-					elem_interval.id = "exercise-" + i;
-					let elem_icon = document.createElement("span");
-					elem_icon.className = "exer-icon";
-					elem_icon.innerHTML = "&#x1f5d1;";
-					elem_icon.onclick = (event) => {
-						let idx = Number(event.target.parentElement.id.slice(9));
-						if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
-							removeInterval(idx);
+						intervals[i].end_time = temp;
+						intervals[i].type = intervals[i].name.toLowerCase();
+						if (intervals[i].type != "intro" && intervals[i].type != "outro" && intervals[i].type != "rest") {
+							intervals[i].type = "exercise";
+							let temp1 = intervals[i].name.indexOf(" - ");
+							console.log(temp1)
+							if (temp1 >= 0) {
+								intervals[i].id = intervals[i].name.slice(0, temp1);
+								intervals[i].name = intervals[i].name.slice(temp1 + 3);
+							} else {
+								intervals[i].id = getExerciseId(intervals[i].name);
+							}
 						}
-					};
-					let elem_name = document.createElement("span");
-					elem_name.className = "exer-name";
-					elem_name.innerHTML = intervals[i].name;
-					elem_name.onclick = (event) => {
-						let idx = Number(event.target.parentElement.id.slice(9));
-						if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
-							gotoInterval(idx);
+						let elem_interval = document.createElement("div");
+						elem_interval.classList = ["exercise"];
+						if (intervals[i].type != "exercise") {
+							elem_interval.classList.add(intervals[i].type);
 						}
-					};
-					elem_interval.appendChild(elem_icon);
-					elem_interval.appendChild(elem_name);
-					elem_interval.onmousedown = (event) => {
-						let idx = Number(event.target.parentElement.id.slice(9));
-						if (!(idx >= 0 && idx < intervals.length)) {
-							return;
-						}
-						if (event.offsetX < 5) {
-							if (idx == 0) {
+						elem_interval.style.width = (intervals[i].duration / dur_audio * 100) + "%";
+						elem_interval.id = "exercise-" + i;
+						let elem_icon = document.createElement("span");
+						elem_icon.className = "exer-icon";
+						elem_icon.innerHTML = "&#x1f5d1;";
+						elem_icon.onclick = (event) => {
+							let idx = Number(event.target.parentElement.id.slice(9));
+							if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+								removeInterval(idx);
+							}
+						};
+						let elem_name = document.createElement("span");
+						elem_name.className = "exer-name";
+						elem_name.innerHTML = intervals[i].name;
+						elem_name.onclick = (event) => {
+							let idx = Number(event.target.parentElement.id.slice(9));
+							if (event.offsetX >= 5 && event.offsetX <= event.target.offsetWidth - 5) {
+								gotoInterval(idx);
+							}
+						};
+						elem_interval.appendChild(elem_icon);
+						elem_interval.appendChild(elem_name);
+						elem_interval.onmousedown = (event) => {
+							let idx = Number(event.target.parentElement.id.slice(9));
+							if (!(idx >= 0 && idx < intervals.length)) {
 								return;
 							}
-							idx --;
-						} else if (event.target.offsetWidth - event.offsetX >= 5) {
-							return;
+							if (event.offsetX < 5) {
+								if (idx == 0) {
+									return;
+								}
+								idx --;
+							} else if (event.target.offsetWidth - event.offsetX >= 5) {
+								return;
+							}
+							drag_x = event.x;
+							document.body.style.cursor = "col-resize";
+							drag_idx = idx;
+							cont_exercises.onmousemove = (event1) => {
+								resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+								drag_x = event1.x;
+							}
+							document.body.onmouseup = () => {
+								cont_exercises.onmousemove = () => {};
+								document.body.style.cursor = "auto";
+								finishResizeInterval();
+							}
 						}
-						drag_x = event.x;
-						document.body.style.cursor = "col-resize";
-						drag_idx = idx;
-						cont_exercises.onmousemove = (event1) => {
-							resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
-							drag_x = event1.x;
-						}
-						document.body.onmouseup = () => {
-							cont_exercises.onmousemove = () => {};
-							document.body.style.cursor = "auto";
-							finishResizeInterval();
-						}
+						cont_exercises.appendChild(elem_interval);
 					}
-					cont_exercises.appendChild(elem_interval);
 				}
 			}
-		});
+		};
 		xHttp.send(null);
-	});
+	};
 	audio.ontimeupdate = () => {
 		cur_time = audio.currentTime;
 		text_cur_time.innerText = ("00" + parseInt(cur_time / 60).toString()).slice(-2)
