@@ -54,6 +54,16 @@ input_csv.onchange = () => {
 		let res = fileReader.result.split("\n");
 		for (i = 1; i < res.length; i++) {
 			let res1 = res[i].split(",");
+			let st_br = res1[2].indexOf("(");
+			let en_br = res1[2].indexOf(")");
+			if (st_br >= 0) {
+				res1[2] = res1[2].slice(st_br + 1, en_br);
+			}
+			st_br = res1[3].indexOf("(");
+			en_br = res1[3].indexOf(")");
+			if (st_br >= 0) {
+				res1[3] = res1[3].slice(st_br + 1, en_br);
+			}
 			workouts.push({
 				id: res1[0],
 				name: res1[1],
