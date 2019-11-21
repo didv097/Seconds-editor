@@ -138,6 +138,7 @@ function resizeInterval(idx, offT) {
 
 function finishResizeInterval(idx) {
 	intervals[idx].duration = Math.round(intervals[idx].duration);
+	intervals[idx].duration = Math.max(intervals[idx].duration, 1);
 	intervals[idx].end_time = intervals[idx].start_time + intervals[idx].duration;
 	if (idx < intervals.length - 1) {
 		intervals[idx + 1].start_time = intervals[idx].end_time;

@@ -29,6 +29,7 @@ div {
 .exercise {
 	background-color: #2196f3;
 	border-right: 1px solid #cfdfef;
+	user-select: none;
 	/* 166 213 250 */
 }
 
