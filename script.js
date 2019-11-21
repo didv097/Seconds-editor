@@ -432,7 +432,7 @@ function btnProcessClicked() {
 	btn_add_outro.onclick = () => {
 		addInterval("Outro");
 	};
-	btn_save.onclick = btn_save_all.onclick = () => {
+	btn_save_all.onclick = () => {
 		let temp = {};
 		Object.assign(temp, json_content);
 		let temp1 = [];
@@ -463,8 +463,6 @@ function btnProcessClicked() {
 		} else {
 			temp.packs[0].items[0].intervals = temp1;
 		}
-		btn_save.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
-		btn_save.setAttribute("download", workouts[selectedIndex].id + " - " + workouts[selectedIndex].name + ".seconds");
 		btn_save_all.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
 		btn_save_all.setAttribute("download", workouts[selectedIndex].id + " - " + workouts[selectedIndex].name + ".seconds");
 	};
@@ -686,7 +684,7 @@ btn_builder.addEventListener("click", () => {
 		getIntervalElement(cur_interval).children[1].innerText = opt_exercises.value;
 		gotoInterval(cur_interval);
 	}
-	btn_save.onclick = btn_save_all.onclick = () => {
+	btn_save_all.onclick = () => {
 		let temp = {
 			"overrun": false,
 			"lastPerformedTimeInterval": 0,
@@ -729,8 +727,6 @@ btn_builder.addEventListener("click", () => {
 			};
 			temp.intervals.push(temp1);
 		}
-		btn_save.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
-		btn_save.setAttribute("download", "1.seconds");
 		btn_save_all.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
 		btn_save_all.setAttribute("download", "1.seconds");
 	}
