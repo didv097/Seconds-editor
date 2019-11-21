@@ -54,13 +54,13 @@ input_csv.onchange = () => {
 		let res = fileReader.result.split("\n");
 		for (i = 1; i < res.length; i++) {
 			let res1 = res[i].split(",");
-			let st_br = res1[2].indexOf("(");
-			let en_br = res1[2].indexOf(")");
+			let st_br = res1[2].lastIndexOf("(");
+			let en_br = res1[2].lastIndexOf(")");
 			if (st_br >= 0) {
 				res1[2] = res1[2].slice(st_br + 1, en_br);
 			}
-			st_br = res1[3].indexOf("(");
-			en_br = res1[3].indexOf(")");
+			st_br = res1[3].lastIndexOf("(");
+			en_br = res1[3].lastIndexOf(")");
 			if (st_br >= 0) {
 				res1[3] = res1[3].slice(st_br + 1, en_br);
 			}
@@ -95,6 +95,15 @@ xHttpCSV.addEventListener("load", () => {
 	}
 });
 xHttpCSV.send(null);
+function getExerciseId(name) {
+	for (let ex of exercises) {
+		if (ex.name.toLowerCase() == name.toLowerCase()) {
+			console.log(ex)
+			return ex.id;
+		}
+	}
+	return 0;
+}
 function getIntervalElement(idx) {
 	return document.getElementById("exercise-" + idx);
 }
@@ -187,7 +196,7 @@ function btnProcessClicked() {
 		dur_audio = parseInt(audio.duration);
 		document.getElementById("audio-duration").innerText = ("00" + parseInt(dur_audio / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(dur_audio % 60).toString()).slice(-2);
-		audio.play()
+		// audio.play()
 		cur_time = 0;
 		progressbar.style.width = "0%";
 
@@ -212,10 +221,17 @@ function btnProcessClicked() {
 						break;
 					}
 					intervals[i].end_time = temp;
-					if (intervals[i].name.indexOf(" - ") >= 0) {
+					intervals[i].type = intervals[i].name.toLowerCase();
+					if (intervals[i].type != "intro" && intervals[i].type != "outro" && intervals[i].type != "rest") {
 						intervals[i].type = "exercise";
-					} else {
-						intervals[i].type = intervals[i].name.toLowerCase();
+						let temp1 = intervals[i].name.indexOf(" - ");
+						console.log(temp1)
+						if (temp1 >= 0) {
+							intervals[i].id = intervals[i].name.slice(0, temp1);
+							intervals[i].name = intervals[i].name.slice(temp1 + 3);
+						} else {
+							intervals[i].id = getExerciseId(intervals[i].name);
+						}
 					}
 					let elem_interval = document.createElement("div");
 					elem_interval.classList = ["exercise"];
@@ -328,7 +344,7 @@ function btnProcessClicked() {
 		intervals[cur_interval].name = opt_exercises.value;
 		getIntervalElement(cur_interval).children[1].innerText = opt_exercises.value;
 	}
-	function addExercise(type) {
+	function addInterval(type) {
 		let new_idx = intervals.length;
 		let remaning_time, start_time;
 		if (new_idx == 0) {
@@ -344,6 +360,7 @@ function btnProcessClicked() {
 		let new_interval = {
 			name: type,
 			type: type.toLowerCase(),
+			id: getExerciseId(type),
 			start_time: start_time,
 			duration: Math.min(remaning_time, 20)
 		};
@@ -400,16 +417,16 @@ function btnProcessClicked() {
 		cont_exercises.appendChild(elem_interval);
 	}
 	btn_add_exercise.onclick = () => {
-		addExercise("Exercise");
+		addInterval("Exercise");
 	};
 	btn_add_rest.onclick = () => {
-		addExercise("Rest");
+		addInterval("Rest");
 	};
 	btn_add_intro.onclick = () => {
-		addExercise("Intro");
+		addInterval("Intro");
 	};
 	btn_add_outro.onclick = () => {
-		addExercise("Outro");
+		addInterval("Outro");
 	};
 	btn_save.onclick = btn_save_all.onclick = () => {
 		let temp = {};
@@ -434,7 +451,7 @@ function btnProcessClicked() {
 				"halfwayAlert":false,
 				"duration":it.duration,
 				"_type":"int",
-				"name": it.name
+				"name": it.id ? it.id + " - " + it.name : it.name
 			});
 		}
 		if (temp.hasOwnProperty("overrun")) {
@@ -442,9 +459,10 @@ function btnProcessClicked() {
 		} else {
 			temp.packs[0].items[0].intervals = temp1;
 		}
-		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
-		let blobUrl = (URL || webkitURL).createObjectURL(file);
-		window.location = blobUrl;
+		btn_save.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
+		btn_save.setAttribute("download", workouts[selectedIndex].id + " - " + workouts[selectedIndex].name + ".seconds");
+		btn_save_all.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
+		btn_save_all.setAttribute("download", workouts[selectedIndex].id + " - " + workouts[selectedIndex].name + ".seconds");
 	};
 	/* btnProcessClicked() */
 }
@@ -577,11 +595,12 @@ btn_builder.addEventListener("click", () => {
 			}
 		}
 	}
-	function addExercise(type) {
+	function addInterval(type) {
 		cur_interval = intervals.length;
 		let new_interval = {
 			name: type,
 			type: type.toLowerCase(),
+			id: getExerciseId(type),
 			start_time: cur_interval == 0 ? 0 : intervals[cur_interval - 1].end_time,
 			duration: 20
 		};
@@ -644,16 +663,16 @@ btn_builder.addEventListener("click", () => {
 		gotoInterval(cur_interval);
 	}
 	btn_add_exercise.onclick = () => {
-		addExercise("Exercise");
+		addInterval("Exercise");
 	}
 	btn_add_rest.onclick = () => {
-		addExercise("Rest");
+		addInterval("Rest");
 	}
 	btn_add_intro.onclick = () => {
-		addExercise("Intro");
+		addInterval("Intro");
 	}
 	btn_add_outro.onclick = () => {
-		addExercise("Outro");
+		addInterval("Outro");
 	}
 	opt_exercises.onchange = () => {
 		if (opt_exercises == "" || cur_interval < 0) {
@@ -702,12 +721,13 @@ btn_builder.addEventListener("click", () => {
 				"halfwayAlert":false,
 				"duration":it.duration,
 				"_type":"int",
-				"name": it.type + " - " + it.name
+				"name": it.id ? it.id + " - " + it.name : it.name
 			};
 			temp.intervals.push(temp1);
 		}
-		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
-		let blobUrl = (URL || webkitURL).createObjectURL(file);
-		window.location = blobUrl;
+		btn_save.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
+		btn_save.setAttribute("download", "1.seconds");
+		btn_save_all.setAttribute("href", "data:" + "application/json" + "," + encodeURIComponent(JSON.stringify(temp, null, "   ")))
+		btn_save_all.setAttribute("download", "1.seconds");
 	}
 });
