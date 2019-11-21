@@ -46,16 +46,23 @@
 				<button type="button" id="btn-next" class="btn btn-outline-primary">Next</button>
 			</div>
 		</div>
-		<div class="row btn-group" role="group">
-			<button type="button" id="btn-back10s" class="btn btn-outline-dark">Back 10s</button>
-			<button type="button" id="btn-play" class="btn btn-outline-dark">Play</button>
-			<button type="button" id="btn-pause" class="btn btn-outline-dark">Pause</button>
-			<button type="button" id="btn-forward10s" class="btn btn-outline-dark">Forward 10s</button>
-		</div>
 		<div class="row">
-			<div class="col-8">
+			<div class="col-sm btn-group" id="btn-group-bppf" role="group">
+				<button type="button" id="btn-back10s" class="btn btn-outline-dark">Back 10s</button>
+				<button type="button" id="btn-play" class="btn btn-outline-dark">Play</button>
+				<button type="button" id="btn-pause" class="btn btn-outline-dark">Pause</button>
+				<button type="button" id="btn-forward10s" class="btn btn-outline-dark">Forward 10s</button>
+			</div>
+			<div class="col-sm btn-group" id="btn-group-erio" role="group">
+				<button type="button" id="btn-add-exercise" class="btn btn-outline-dark">Exercise</button>
+				<button type="button" id="btn-add-rest" class="btn btn-outline-dark">Rest</button>
+				<button type="button" id="btn-add-intro" class="btn btn-outline-dark">Intro</button>
+				<button type="button" id="btn-add-outro" class="btn btn-outline-dark">Outro</button>
+			</div>
+		</div>
 				<h4 id="cur-playback">00:00</h4>
-				<div class="row">
+		<div class="row">
+
 					<div class="col">
 						<div class="progress justify-content-between">
 							<div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
@@ -84,17 +91,7 @@
 						</div>
 					</div>
 					<span id="audio-duration" class="col-md-auto">00:00</span>
-				</div>
-			</div>
-			<div class="col-4">
-				Add new
-				<div class="btn-group" role="group">
-					<button type="button" id="btn-add-exercise" class="btn btn-outline-dark">Exercise</button>
-					<button type="button" id="btn-add-rest" class="btn btn-outline-dark">Rest</button>
-					<button type="button" id="btn-add-intro" class="btn btn-outline-dark">Intro</button>
-					<button type="button" id="btn-add-outro" class="btn btn-outline-dark">Outro</button>
-				</div>
-			</div>
+
 		</div>
 		<div class="row">
 			<div class="card">

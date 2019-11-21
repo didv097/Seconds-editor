@@ -196,6 +196,7 @@ function btnProcessClicked() {
 		audio.remove();
 	}
 	audio = new Audio(workouts[selectedIndex].mp3);
+	drag_idx = -1;
 	audio.addEventListener("loadeddata", () => {
 		dur_audio = parseInt(audio.duration);
 		document.getElementById("audio-duration").innerText = ("00" + parseInt(dur_audio / 60).toString()).slice(-2)
@@ -284,7 +285,7 @@ function btnProcessClicked() {
 							resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 							drag_x = event1.x;
 						}
-						cont_exercises.onmouseup = () => {
+						document.body.onmouseup = () => {
 							cont_exercises.onmousemove = () => {};
 							document.body.style.cursor = "auto";
 							finishResizeInterval();
@@ -655,7 +656,7 @@ btn_builder.addEventListener("click", () => {
 				resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
 			}
-			cont_exercises.onmouseup = () => {
+			document.body.onmouseup = () => {
 				document.body.style.cursor = "auto";
 				cont_exercises.onmousemove = () => {};
 				finishResizeInterval();

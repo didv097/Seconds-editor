@@ -111,3 +111,7 @@ p {
 	width: 100%;
 	margin-top: 1rem;
 }
+
+#btn-group-erio::before {
+	content: "Add new";
+}
