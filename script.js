@@ -213,11 +213,9 @@ function btnProcessClicked() {
 					}
 					intervals[i].end_time = temp;
 					if (intervals[i].name.indexOf(" - ") >= 0) {
-						let type_name = intervals[i].name.split(" - ");
-						intervals[i].type = type_name[0].toLowerCase();
-						intervals[i].name = type_name[1];
-					} else {
 						intervals[i].type = "exercise";
+					} else {
+						intervals[i].type = intervals[i].name.toLowerCase();
 					}
 					let elem_interval = document.createElement("div");
 					elem_interval.classList = ["exercise"];
@@ -436,7 +434,7 @@ function btnProcessClicked() {
 				"halfwayAlert":false,
 				"duration":it.duration,
 				"_type":"int",
-				"name": it.type + " - " + it.name
+				"name": it.name
 			});
 		}
 		if (temp.hasOwnProperty("overrun")) {
