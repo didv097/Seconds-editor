@@ -39,7 +39,7 @@ let selectedWorkout = -1;
 let dur_audio = 0, cur_time = 0;
 let cur_interval = -1, cur_exercise = -1;
 let cur_start_time = 0, cur_duration = 0, cur_end_time = 0;
-let csv_content = {};
+let json_content = {};
 let drag_x = 0, drag_idx = -1;
 
 input_csv.onchange = () => {
@@ -186,8 +186,12 @@ function btnProcessClicked() {
 		xHttp.open("GET", workouts[selectedIndex].live_data, true);
 		xHttp.addEventListener("load", () => {
 			if (xHttp.readyState == 4 && xHttp.status == 200) {
-				csv_content = JSON.parse(xHttp.responseText);
-				intervals = csv_content.intervals;
+				json_content = JSON.parse(xHttp.responseText);
+				if (json_content.hasOwnProperty("overrun")) {
+					intervals = json_content.intervals;
+				} else {
+					intervals = json_content.packs[0].items[0].intervals;
+				}
 				cont_exercises.innerHTML = "";
 				let temp = 0;
 				for (let i = 0; i < intervals.length; i ++) {
@@ -198,9 +202,13 @@ function btnProcessClicked() {
 						break;
 					}
 					intervals[i].end_time = temp;
-					let type_name = intervals[i].name.split(" - ");
-					intervals[i].type = type_name[0].toLowerCase();
-					intervals[i].name = type_name[1];
+					if (intervals[i].name.indexOf(" - ") >= 0) {
+						let type_name = intervals[i].name.split(" - ");
+						intervals[i].type = type_name[0].toLowerCase();
+						intervals[i].name = type_name[1];
+					} else {
+						intervals[i].type = "exercise";
+					}
 					let elem_interval = document.createElement("div");
 					elem_interval.classList = ["exercise"];
 					if (intervals[i].type != "exercise") {
@@ -396,27 +404,11 @@ function btnProcessClicked() {
 		addExercise("Outro");
 	};
 	btn_save.onclick = btn_save_all.onclick = () => {
-		let temp = {
-			"overrun": csv_content.overrun,
-			"lastPerformedTimeInterval": csv_content.lastPerformedTimeInterval,
-			"intervals": [],
-			"numberOfSets": csv_content.numberOfSets,
-			"_type": csv_content._type,
-			"soundScheme": csv_content.soundScheme,
-			"music":{
-					"_type": csv_content.music._type,
-					"shuffle": csv_content.music.shuffle,
-					"volume": csv_content.music.volume,
-					"resume": csv_content.music.resume,
-					"persist": csv_content.music.persist
-			},
-			"type": csv_content.type,
-			"identifier": csv_content.identifier,
-			"name": csv_content.name,
-			"activity": csv_content.activity
-		}
+		let temp = {};
+		Object.assign(temp, json_content);
+		let temp1 = [];
 		for (let it of intervals) {
-			let temp1 = {
+			temp1.push({
 				"splitRest": 0,
 				"ducked": false,
 				"rest": false,
@@ -435,16 +427,13 @@ function btnProcessClicked() {
 				"duration":it.duration,
 				"_type":"int",
 				"name": it.type + " - " + it.name
-			};
-			temp.intervals.push(temp1);
+			});
 		}
-		// let xHttp = new XMLHttpRequest();
-		// xHttp.open("PUT", workouts[selectedIndex].live_data, true);
-		// let blob = new Blob([JSON.stringify(temp, null, "   ")], {type: "application/json"});
-		// xHttp.onload = () => {
-		// 	console.log(xHttp.response)
-		// }
-		// xHttp.send(blob);
+		if (temp.hasOwnProperty("overrun")) {
+			temp.intervals = temp1;
+		} else {
+			temp.packs[0].items[0].intervals = temp1;
+		}
 		let file = new File([JSON.stringify(temp, null, "   ")], "1.json", {type: "application/octet-stream"});
 		let blobUrl = (URL || webkitURL).createObjectURL(file);
 		window.location = blobUrl;
