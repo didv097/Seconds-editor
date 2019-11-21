@@ -40,7 +40,7 @@ let dur_audio = 0, cur_time = 0;
 let cur_interval = -1, cur_exercise = -1;
 let cur_start_time = 0, cur_duration = 0, cur_end_time = 0;
 let csv_content = {};
-let drag_x = 0;
+let drag_x = 0, drag_idx = -1;
 
 input_csv.onchange = () => {
 	opt_workout.length = 0;
@@ -125,31 +125,40 @@ function updateIntervals() {
 	}
 }
 
-function resizeInterval(idx, offT) {
-	intervals[idx].duration += offT;
-	intervals[idx].end_time += offT;
-	if (idx < intervals.length - 1) {
-		intervals[idx + 1].duration -= offT;
-		intervals[idx + 1].start_time += offT;
-		cont_exercises.children[idx + 1].style.width = intervals[idx + 1].duration / dur_audio * 100 + "%";
+function resizeInterval(offT) {
+	if (drag_idx < 0) {
+		return;
 	}
-	cont_exercises.children[idx].style.width = intervals[idx].duration / dur_audio * 100 + "%";
+	intervals[drag_idx].duration += offT;
+	intervals[drag_idx].end_time += offT;
+	if (drag_idx < intervals.length - 1) {
+		intervals[drag_idx + 1].duration -= offT;
+		intervals[drag_idx + 1].start_time += offT;
+		cont_exercises.children[drag_idx + 1].style.width = intervals[drag_idx + 1].duration / dur_audio * 100 + "%";
+	}
+	cont_exercises.children[drag_idx].style.width = intervals[drag_idx].duration / dur_audio * 100 + "%";
 }
 
-function finishResizeInterval(idx) {
-	intervals[idx].duration = Math.round(intervals[idx].duration);
-	intervals[idx].duration = Math.max(intervals[idx].duration, 1);
-	intervals[idx].end_time = intervals[idx].start_time + intervals[idx].duration;
-	if (idx < intervals.length - 1) {
-		intervals[idx + 1].start_time = intervals[idx].end_time;
-		intervals[idx + 1].duration = intervals[idx + 1].end_time - intervals[idx + 1].start_time;
+function finishResizeInterval() {
+	if (drag_idx < 0) {
+		return;
 	}
-	cur_start_time = intervals[cur_interval].start_time;
-	cur_duration = intervals[cur_interval].duration;
-	cur_end_time = intervals[cur_interval].end_time;
-	input_start_time.value = cur_start_time;
-	input_duration.value = cur_duration;
-	input_end_time.value = cur_end_time;
+	intervals[drag_idx].duration = Math.round(intervals[drag_idx].duration);
+	intervals[drag_idx].duration = Math.max(intervals[drag_idx].duration, 1);
+	intervals[drag_idx].end_time = intervals[drag_idx].start_time + intervals[drag_idx].duration;
+	if (drag_idx < intervals.length - 1) {
+		intervals[drag_idx + 1].start_time = intervals[drag_idx].end_time;
+		intervals[drag_idx + 1].duration = intervals[drag_idx + 1].end_time - intervals[drag_idx + 1].start_time;
+	}
+	if (cur_interval >= 0) {
+		cur_start_time = intervals[cur_interval].start_time;
+		cur_duration = intervals[cur_interval].duration;
+		cur_end_time = intervals[cur_interval].end_time;
+		input_start_time.value = cur_start_time;
+		input_duration.value = cur_duration;
+		input_end_time.value = cur_end_time;
+	}
+	drag_idx = -1;
 }
 
 function btnProcessClicked() {
@@ -234,14 +243,15 @@ function btnProcessClicked() {
 						}
 						drag_x = event.x;
 						document.body.style.cursor = "col-resize";
+						drag_idx = idx;
 						cont_exercises.onmousemove = (event1) => {
-							resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+							resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 							drag_x = event1.x;
 						}
 						cont_exercises.onmouseup = () => {
 							cont_exercises.onmousemove = () => {};
 							document.body.style.cursor = "auto";
-							finishResizeInterval(idx);
+							finishResizeInterval();
 						}
 					}
 					cont_exercises.appendChild(elem_interval);
@@ -365,8 +375,9 @@ function btnProcessClicked() {
 			}
 			drag_x = event.x;
 			document.body.style.cursor = "col-resize";
+			drag_idx = idx;
 			cont_exercises.onmousemove = (event1) => {
-				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+				resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
 			}
 		}
@@ -621,14 +632,15 @@ btn_builder.addEventListener("click", () => {
 			}
 			drag_x = event.x;
 			document.body.style.cursor = "col-resize";
+			drag_idx = idx;
 			cont_exercises.onmousemove = (event1) => {
-				resizeInterval(idx, (event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
+				resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
 			}
 			cont_exercises.onmouseup = () => {
 				document.body.style.cursor = "auto";
 				cont_exercises.onmousemove = () => {};
-				finishResizeInterval(idx);
+				finishResizeInterval();
 			}
 		}
 		cont_exercises.appendChild(elem_interval);
