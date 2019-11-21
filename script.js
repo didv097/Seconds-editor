@@ -191,12 +191,16 @@ function btnProcessClicked() {
 	text_workout_id.innerText = workouts[selectedIndex].id;
 	text_workout_name.innerText = workouts[selectedIndex].name;
 
+	if (audio) {
+		audio.pause();
+		audio.remove();
+	}
 	audio = new Audio(workouts[selectedIndex].mp3);
 	audio.addEventListener("loadeddata", () => {
 		dur_audio = parseInt(audio.duration);
 		document.getElementById("audio-duration").innerText = ("00" + parseInt(dur_audio / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(dur_audio % 60).toString()).slice(-2);
-		// audio.play()
+		audio.play();
 		cur_time = 0;
 		progressbar.style.width = "0%";
 
