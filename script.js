@@ -516,11 +516,18 @@ input_end_time.onchange = () => {
 	if (cur_interval < 0) {
 		return;
 	}
-	if (cur_interval >= intervals.length - 1) {
+	if (cur_interval > intervals.length - 1) {
 		input_end_time.value = cur_end_time;
 		return;
 	}
-	if (input_end_time.value <= cur_start_time || input_end_time.value >= intervals[cur_interval + 1].end_time) {
+	if (input_end_time.value <= cur_start_time) {
+		input_end_time.value = cur_end_time;
+	}
+	if (cur_interval == intervals.length - 1) {
+		if (input_end_time.value > dur_audio) {
+			input_end_time.value = cur_end_time;
+		}
+	} else if (input_end_time.value >= intervals[cur_interval + 1].end_time) {
 		input_end_time.value = cur_end_time;
 	}
 	cur_end_time = Number(input_end_time.value);
