@@ -114,4 +114,6 @@ p {
 
 #btn-group-erio::before {
 	content: "Add new";
+	margin: auto;
+	margin-right: 1rem;
 }
