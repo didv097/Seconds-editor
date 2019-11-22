@@ -214,14 +214,16 @@ function btnProcessClicked() {
 		cur_time = 0;
 		progressbar.style.width = "0%";
 
+		json_content = {};
 		intervals = [];
+		cont_exercises.innerHTML = "";
 		let xHttp = new XMLHttpRequest();
 		xHttp.open("GET", workouts[selectedIndex].live_data, true);
 		xHttp.onreadystatechange = () => {
 			if (xHttp.readyState == 4) {
 				if (xHttp.status != 200) {
-					location.reload();
-					console.log("Error loading data");
+					json_content = {};
+					intervals = [];
 				} else {
 					json_content = JSON.parse(xHttp.responseText);
 					if (json_content.hasOwnProperty("overrun")) {
@@ -229,7 +231,6 @@ function btnProcessClicked() {
 					} else {
 						intervals = json_content.packs[0].items[0].intervals;
 					}
-					cont_exercises.innerHTML = "";
 					let temp = 0;
 					for (let i = 0; i < intervals.length; i ++) {
 						intervals[i].start_time = temp;
@@ -337,21 +338,23 @@ function btnProcessClicked() {
 			input_duration.value = cur_duration;
 			input_end_time.value = cur_end_time;
 			text_exercise.innerText = intervals[cur_interval].name;
-		}
-		btn_match.className = "btn btn-danger";
-		btn_match.innerText = "Not match";
-		opt_exercises.value = "";
-		for (ex of exercises) {
-			if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
-				btn_match.className = "btn btn-success";
-				btn_match.innerText = "Match";
-				opt_exercises.value = ex.name;
-				break;
+			if (intervals[cur_interval].type == "exercise") {
+				btn_match.className = "btn btn-danger";
+				btn_match.innerText = "Not match";
+				opt_exercises.value = "";
+				for (ex of exercises) {
+					if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
+						btn_match.className = "btn btn-success";
+						btn_match.innerText = "Match";
+						opt_exercises.value = ex.name;
+						break;
+					}
+				}
 			}
 		}
 	};
 	opt_exercises.onchange = () => {
-		if (opt_exercises == "" || cur_interval < 0) {
+		if (opt_exercises == "" || cur_interval < 0 || intervals[cur_interval].type != "exercise") {
 			return;
 		}
 		intervals[cur_interval].name = opt_exercises.value;
@@ -594,15 +597,17 @@ btn_builder.addEventListener("click", () => {
 		input_start_time.value = cur_start_time;
 		input_duration.value = cur_duration;
 		input_end_time.value = cur_end_time;
-		btn_match.className = "btn btn-danger";
-		btn_match.innerText = "Not match";
-		opt_exercises.value = "";
-		for (ex of exercises) {
-			if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
-				btn_match.className = "btn btn-success";
-				btn_match.innerText = "Match";
-				opt_exercises.value = ex.name;
-				break;
+		if (intervals[cur_interval].type == "exercise") {
+			btn_match.className = "btn btn-danger";
+			btn_match.innerText = "Not match";
+			opt_exercises.value = "";
+			for (ex of exercises) {
+				if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
+					btn_match.className = "btn btn-success";
+					btn_match.innerText = "Match";
+					opt_exercises.value = ex.name;
+					break;
+				}
 			}
 		}
 	}
@@ -681,7 +686,7 @@ btn_builder.addEventListener("click", () => {
 		addInterval("Outro");
 	}
 	opt_exercises.onchange = () => {
-		if (opt_exercises == "" || cur_interval < 0) {
+		if (opt_exercises == "" || cur_interval < 0 || intervals[cur_interval].type != "exercise") {
 			return;
 		}
 		intervals[cur_interval].name = opt_exercises.value;
