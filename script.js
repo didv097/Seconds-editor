@@ -342,6 +342,7 @@ function btnProcessClicked() {
 				btn_match.className = "btn btn-danger";
 				btn_match.innerText = "Not match";
 				opt_exercises.value = "";
+				opt_exercises.style.display = "block";
 				for (ex of exercises) {
 					if (cur_interval >= 0 && intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
 						btn_match.className = "btn btn-success";
@@ -353,7 +354,8 @@ function btnProcessClicked() {
 			} else {
 				btn_match.className = "btn light";
 				btn_match.innerText = "";
-				opt_exercises.value = "";
+				opt_exercises.value = ""
+				opt_exercises.style.display = "none";
 			}
 		}
 	};
@@ -604,6 +606,7 @@ btn_builder.addEventListener("click", () => {
 		if (intervals[cur_interval].type == "exercise") {
 			btn_match.className = "btn btn-danger";
 			btn_match.innerText = "Not match";
+			opt_exercises.style.display = "block";
 			opt_exercises.value = "";
 			for (ex of exercises) {
 				if (intervals[cur_interval].name.toLowerCase() == ex.name.toLowerCase()) {
@@ -617,6 +620,7 @@ btn_builder.addEventListener("click", () => {
 			btn_match.className = "btn light";
 			btn_match.innerText = "";
 			opt_exercises.value = "";
+			opt_exercises.style.display = "none";
 		}
 	}
 	function addInterval(type) {
