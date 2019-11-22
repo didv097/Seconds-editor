@@ -350,6 +350,10 @@ function btnProcessClicked() {
 						break;
 					}
 				}
+			} else {
+				btn_match.className = "btn light";
+				btn_match.innerText = "";
+				opt_exercises.value = "";
 			}
 		}
 	};
@@ -609,6 +613,10 @@ btn_builder.addEventListener("click", () => {
 					break;
 				}
 			}
+		} else {
+			btn_match.className = "btn light";
+			btn_match.innerText = "";
+			opt_exercises.value = "";
 		}
 	}
 	function addInterval(type) {
