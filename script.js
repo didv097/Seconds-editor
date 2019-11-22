@@ -98,7 +98,6 @@ xHttpCSV.send(null);
 function getExerciseId(name) {
 	for (let ex of exercises) {
 		if (ex.name.toLowerCase() == name.toLowerCase()) {
-			console.log(ex)
 			return ex.id;
 		}
 	}
@@ -180,6 +179,12 @@ function finishResizeInterval() {
 	drag_idx = -1;
 }
 
+document.body.onmouseup = () => {
+	cont_exercises.onmousemove = () => {};
+	document.body.style.cursor = "auto";
+	finishResizeInterval();
+}
+
 function btnProcessClicked() {
 	selectedIndex = opt_workout.selectedIndex;
 	if (selectedIndex < 0) {
@@ -199,7 +204,7 @@ function btnProcessClicked() {
 	drag_idx = -1;
 	audio.onerror = () => {
 		location.reload();
-		alert("Error loading audio");
+		console.log("Error loading audio");
 	}
 	audio.onloadeddata = () => {
 		dur_audio = parseInt(audio.duration);
@@ -238,7 +243,6 @@ function btnProcessClicked() {
 						if (intervals[i].type != "intro" && intervals[i].type != "outro" && intervals[i].type != "rest") {
 							intervals[i].type = "exercise";
 							let temp1 = intervals[i].name.indexOf(" - ");
-							console.log(temp1)
 							if (temp1 >= 0) {
 								intervals[i].id = intervals[i].name.slice(0, temp1);
 								intervals[i].name = intervals[i].name.slice(temp1 + 3);
@@ -292,11 +296,6 @@ function btnProcessClicked() {
 							cont_exercises.onmousemove = (event1) => {
 								resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 								drag_x = event1.x;
-							}
-							document.body.onmouseup = () => {
-								cont_exercises.onmousemove = () => {};
-								document.body.style.cursor = "auto";
-								finishResizeInterval();
 							}
 						}
 						cont_exercises.appendChild(elem_interval);
@@ -664,11 +663,6 @@ btn_builder.addEventListener("click", () => {
 			cont_exercises.onmousemove = (event1) => {
 				resizeInterval((event1.x - drag_x) / cont_exercises.offsetWidth * dur_audio);
 				drag_x = event1.x;
-			}
-			document.body.onmouseup = () => {
-				document.body.style.cursor = "auto";
-				cont_exercises.onmousemove = () => {};
-				finishResizeInterval();
 			}
 		}
 		cont_exercises.appendChild(elem_interval);
