@@ -243,8 +243,10 @@ function btnProcessClicked() {
 				 };
 					intervals = [];
 					console.log('no data')
+					console.log(xHttp)
 				} else {
 					console.log('data')
+					console.log(xHttp)
 					json_content = JSON.parse(xHttp.responseText);
 					if (json_content.hasOwnProperty("overrun")) {
 						intervals = json_content.intervals;
