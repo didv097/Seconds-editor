@@ -222,8 +222,27 @@ function btnProcessClicked() {
 		xHttp.onreadystatechange = () => {
 			if (xHttp.readyState == 4) {
 				if (xHttp.status != 200) {
-					json_content = {};
+					json_content = { 
+						"overrun":false,
+						"lastPerformedTimeInterval":0,
+						"intervals":[],
+						"numberOfSets":9,
+						"_type":"cust",
+						"soundScheme":1,
+						"music":{ 
+							 "_type":"music",
+							 "shuffle":false,
+							 "volume":1,
+							 "resume":true,
+							 "persist":false
+						},
+						"type":0,
+						"identifier":workouts[selectedIndex].id,
+						"name": workouts[selectedIndex].name,
+						"activity":0
+				 };
 					intervals = [];
+					console.log('no data')
 				} else {
 					json_content = JSON.parse(xHttp.responseText);
 					if (json_content.hasOwnProperty("overrun")) {
