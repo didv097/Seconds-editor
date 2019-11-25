@@ -221,7 +221,7 @@ function btnProcessClicked() {
 		xHttp.open("GET", workouts[selectedIndex].live_data, true);
 		xHttp.onreadystatechange = () => {
 			if (xHttp.readyState == 4) {
-				if (xHttp.status != 200) {
+				if (xHttp.status != 200 || xHttp.responseText[0] != "{") {
 					json_content = { 
 						"overrun":false,
 						"lastPerformedTimeInterval":0,
