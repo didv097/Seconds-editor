@@ -12,7 +12,6 @@ let text_workout_id = document.getElementById("workout-id");
 let text_workout_name = document.getElementById("workout-name");
 let btn_back10 = document.getElementById("btn-back10s");
 let btn_play = document.getElementById("btn-play");
-let btn_pause = document.getElementById("btn-pause");
 let btn_forward10 = document.getElementById("btn-forward10s");
 let text_cur_time = document.getElementById("cur-playback");
 let progressbar = document.getElementById("progress-bar");
@@ -211,6 +210,7 @@ function btnProcessClicked() {
 		document.getElementById("audio-duration").innerText = ("00" + parseInt(dur_audio / 60).toString()).slice(-2)
 			+ ":" + ("00" + parseInt(dur_audio % 60).toString()).slice(-2);
 		audio.play();
+		btn_play.innerText = "Pause";
 		cur_time = 0;
 		progressbar.style.width = "0%";
 
@@ -559,16 +559,19 @@ input_end_time.onchange = () => {
 };
 btn_process.onclick = () => btnProcessClicked();
 btn_play.onclick = () => {
-	audio.play();
-	input_start_time.readOnly = true;
-	input_duration.readOnly = true;
-	input_end_time.readOnly = true;
-};
-btn_pause.onclick = () => {
-	audio.pause();
-	input_start_time.readOnly = false;
-	input_duration.readOnly = false;
-	input_end_time.readOnly = false;
+	if (audio.paused) {
+		audio.play();
+		input_start_time.readOnly = true;
+		input_duration.readOnly = true;
+		input_end_time.readOnly = true;
+		btn_play.innerText = "Pause";
+	} else {
+		audio.pause();
+		input_start_time.readOnly = false;
+		input_duration.readOnly = false;
+		input_end_time.readOnly = false;
+		btn_play.innerText = "Play";
+	}
 };
 btn_back10.onclick = () => {
 	cur_time -= 10;
